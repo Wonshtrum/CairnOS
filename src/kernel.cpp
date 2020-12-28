@@ -3,6 +3,7 @@
 #include "gdt.h"
 #include "port.h"
 #include "interrupts.h"
+#include "drivers/drivers.h"
 
 
 typedef void (*constructor)();
@@ -23,10 +24,11 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Global_descriptor_table gdt;
 	print_str("GDT loaded\n");
 
-	Interrupt_Manager interrupt_manager(&gdt);
+	Interrupt_manager interrupt_manager(&gdt);
 	print_str("IDT initialized!\n");
 
 	//hook hardware
+	Keyboard_driver keyboard_driver;
 
 	interrupt_manager.activate();
 	print_str("IDT activated\n");

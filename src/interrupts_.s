@@ -1,18 +1,18 @@
 .set IRQ_BASE, 0x20
 .section .text
-.extern _ZN17Interrupt_Manager16handle_interruptEhj
-.global _ZN17Interrupt_Manager16ignore_interruptEv
+.extern _ZN17Interrupt_manager16handle_interruptEhj
+.global _ZN17Interrupt_manager16ignore_interruptEv
 
 .macro handle_exception number
-	.global _ZN17Interrupt_Manager21handle_exception_\number\()Ev
-		_ZN17Interrupt_Manager21handle_exception_\number\()Ev:
+	.global _ZN17Interrupt_manager21handle_exception_\number\()Ev
+		_ZN17Interrupt_manager21handle_exception_\number\()Ev:
 		movb $\number, (interrupt_number)
 		jmp interrupt_handler_call
 .endm
 
 .macro handle_interrupt number
-	.global _ZN17Interrupt_Manager21handle_interrupt_\number\()Ev
-		_ZN17Interrupt_Manager21handle_interrupt_\number\()Ev:
+	.global _ZN17Interrupt_manager21handle_interrupt_\number\()Ev
+		_ZN17Interrupt_manager21handle_interrupt_\number\()Ev:
 		movb $\number + IRQ_BASE, (interrupt_number)
 		jmp interrupt_handler_call
 .endm
@@ -29,7 +29,7 @@ interrupt_handler_call:
 
 	pushl %esp
 	push (interrupt_number)
-	call _ZN17Interrupt_Manager16handle_interruptEhj
+	call _ZN17Interrupt_manager16handle_interruptEhj
 	movl %eax, %esp
 
 	popl %gs
@@ -38,7 +38,7 @@ interrupt_handler_call:
 	popl %ds
 	popa
 
-_ZN17Interrupt_Manager16ignore_interruptEv:
+_ZN17Interrupt_manager16ignore_interruptEv:
 	iret
 
 .data

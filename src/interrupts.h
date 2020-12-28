@@ -10,7 +10,20 @@
 #define IDT_INTERRUPT_GATE 0xE
 
 
-class Interrupt_Manager {
+class Interrupt_handler {
+protected:
+	uint8_t interrupt_number;
+
+	Interrupt_handler(uint8_t interrupt_number);
+	~Interrupt_handler();
+
+public:
+	virtual uint32_t handle(uint32_t esp);
+};
+
+
+class Interrupt_manager {
+friend class Interrupt_handler;
 protected:
 	struct Gate_descriptor {
 		uint16_t handler_addr_lo;
@@ -39,17 +52,20 @@ protected:
 	Port_8bit_slow pic_slave_command;
 	Port_8bit_slow pic_slave_data;
 
-	static Interrupt_Manager* instance;
+	static Interrupt_manager* instance;
+
+	Interrupt_handler* handlers[256];
 
 public:
-	Interrupt_Manager(Global_descriptor_table* gdt);
-	~Interrupt_Manager();
+	Interrupt_manager(Global_descriptor_table* gdt);
+	~Interrupt_manager();
 
-	static Interrupt_Manager* get();
+	static Interrupt_manager* get();
 
 	static void activate();
 
 	static uint32_t handle_interrupt(uint8_t interrupt_number, uint32_t esp);
+	uint32_t do_handle_interrupt(uint8_t interrupt_number, uint32_t esp);
 
 	static void ignore_interrupt();
 	static void handle_interrupt_0x00();

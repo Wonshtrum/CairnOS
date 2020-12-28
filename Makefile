@@ -1,4 +1,4 @@
-GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
+GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -I $(srcdir)
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
@@ -10,20 +10,24 @@ bin = $(name).bin
 iso = $(name).iso
 grub = grub.cfg
 
-SRC = $(wildcard $(srcdir)*.s) $(wildcard $(srcdir)*cpp)
+SRC = $(shell find $(srcdir) -regex ".*\.s\|.*\.cpp")
 OBJ = $(subst $(srcdir), $(bindir), $(patsubst %.s, %.o, $(patsubst %.cpp, %.o, $(SRC))))
 
 $(bindir)%.o : $(srcdir)%.cpp $(srcdir)%.h
+	mkdir -p $(dir $@)
 	g++ $(GPPPARAMS) -o $@ -c $<
 
 $(bindir)%.o : $(srcdir)%.cpp
+	mkdir -p $(dir $@)
 	g++ $(GPPPARAMS) -o $@ -c $<
 
 $(bindir)%.o : $(srcdir)%.s
+	mkdir -p $(dir $@)
 	as $(ASPARAMS) -o $@ $^
 
 bin : $(bin)
 $(bin) : linker.ld $(OBJ)
+	echo $(SRC)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJ)
 
 iso : $(iso)
@@ -42,4 +46,4 @@ box : $(iso)
 	VirtualBox --startvm "My kernel"  &
 
 clean :
-	rm -rf $(bindir)* $(bin) $(iso)
+	rm -rf $(bindir) $(bin) $(iso)
