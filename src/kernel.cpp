@@ -1,4 +1,6 @@
 #include "types.h"
+#include "gdt.h"
+
 
 void print(char* str) {
 	uint16_t* video_mem = (uint16_t*)0xb8000;
@@ -18,5 +20,10 @@ extern "C" void call_constructors() {
 
 extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print("Hello world!                        ");
+
+	Global_descriptor_table();
+	print("GDT loaded!");
+
+
 	while(1);
 }
