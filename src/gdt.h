@@ -2,6 +2,7 @@
 #define __GDT_H__
 
 #include "types.h"
+#include "io.h"
 
 
 class Global_descriptor_table {
@@ -14,10 +15,12 @@ public:
 		uint8_t type;
 		uint8_t flags_span_hi;
 		uint8_t base_vhi;
+
 	public:
 		Segment_descriptor(uint32_t base, uint32_t span, uint8_t type);
 		uint32_t get_base();
 		uint32_t get_span();
+		void print();
 	} __attribute__((packed));
 
 	Segment_descriptor null_segment_selector;

@@ -13,8 +13,11 @@ grub = grub.cfg
 SRC = $(wildcard $(srcdir)*.s) $(wildcard $(srcdir)*cpp)
 OBJ = $(subst $(srcdir), $(bindir), $(patsubst %.s, %.o, $(patsubst %.cpp, %.o, $(SRC))))
 
+$(bindir)%.o : $(srcdir)%.cpp $(srcdir)%.h
+	g++ $(GPPPARAMS) -o $@ -c $<
+
 $(bindir)%.o : $(srcdir)%.cpp
-	g++ $(GPPPARAMS) -o $@ -c $^
+	g++ $(GPPPARAMS) -o $@ -c $<
 
 $(bindir)%.o : $(srcdir)%.s
 	as $(ASPARAMS) -o $@ $^
@@ -24,15 +27,19 @@ $(bin) : linker.ld $(OBJ)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJ)
 
 iso : $(iso)
-$(iso): $(bin)
+$(iso) : $(bin)
 	mkdir -p iso/boot/grub
 	cp $(bin) iso/boot
 	cp $(grub) iso/boot/grub
 	grub-mkrescue --output=$@ iso
 	rm -rf iso
 
-run: $(iso)
+run : $(iso)
 	qemu-system-x86_64 $^
+
+box : $(iso)
+	(killall VirtualBox && sleep 1) || true
+	VirtualBox --startvm "My kernel"  &
 
 clean :
 	rm -rf $(bindir)* $(bin) $(iso)
