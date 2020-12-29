@@ -70,6 +70,7 @@ public:
 	static void ignore_interrupt();
 	static void handle_interrupt_0x00();
 	static void handle_interrupt_0x01();
+	static void handle_interrupt_0x0C();
 };
 
 

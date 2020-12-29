@@ -1,4 +1,4 @@
-GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -I $(srcdir)
+GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -I $(srcdir) -Wno-write-strings
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 

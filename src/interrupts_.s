@@ -19,6 +19,7 @@
 
 handle_interrupt 0x00
 handle_interrupt 0x01
+handle_interrupt 0x0C
 
 interrupt_handler_call:
 	pusha

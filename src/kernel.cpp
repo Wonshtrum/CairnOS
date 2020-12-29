@@ -29,6 +29,7 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 
 	//hook hardware
 	Keyboard_driver keyboard_driver;
+	Mouse_driver mouse_driver;
 
 	interrupt_manager.activate();
 	print_str("IDT activated\n");
