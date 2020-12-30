@@ -5,6 +5,21 @@
 #include "utils/io.h"
 #include "hardware/port.h"
 #include "hardware/interrupts.h"
+#include "drivers/driver.h"
+
+
+enum Base_address_register_type {
+	Memory_mapping = 0,
+	Input_output = 1
+};
+
+
+struct Base_address_register {
+	bool prefetchable;
+	uint8_t* address;
+	uint32_t  size;
+	Base_address_register_type type;
+};
 
 
 struct Device_descriptor {
@@ -40,7 +55,9 @@ public:
 	bool device_has_functions(uint16_t bus, uint16_t device);
 
 	void select_drivers();
+	Driver* get_driver(Device_descriptor device_descriptor);
 	Device_descriptor get_device_descriptor(uint16_t bus, uint16_t device, uint16_t function);
+	Base_address_register get_base_address_register(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar_num);
 };
 
 

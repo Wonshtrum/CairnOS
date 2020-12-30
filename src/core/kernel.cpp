@@ -4,7 +4,7 @@
 #include "hardware/port.h"
 #include "hardware/interrupts.h"
 #include "hardware/pci.h"
-#include "drivers/drivers.h"
+#include "drivers/all.h"
 
 
 typedef void (*constructor)();
@@ -19,8 +19,6 @@ extern "C" void call_constructors() {
 extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("Hello world!\n", true);
 	print_hex(magic_number);
-	print_str("\n");
-
 
 	Global_descriptor_table gdt;
 	print_str("GDT loaded\n");

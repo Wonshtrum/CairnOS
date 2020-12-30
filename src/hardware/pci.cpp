@@ -45,7 +45,15 @@ void Peripheral_component_interconnect_controller::select_drivers() {
 					continue;
 				}
 
-				print_str("BUS ");
+				for (uint8_t bar_num = 0 ; bar_num < 6 ; bar_num++) {
+					Base_address_register bar = get_base_address_register(bus, device, function, bar_num);
+					if (bar.address && (bar.type == Input_output)) {
+						device_descriptor.port_base = (uint32_t)bar.address;
+					}
+					Driver* driver = get_driver(device_descriptor);
+				}
+
+				print_str("\n  BUS ");
 				print_hex(bus);
 				print_str(", DEV ");
 				print_hex(device);
@@ -64,6 +72,35 @@ void Peripheral_component_interconnect_controller::select_drivers() {
 	print_str("\n");
 }
 
+Driver* Peripheral_component_interconnect_controller::get_driver(Device_descriptor device_descriptor) {
+	switch (device_descriptor.vendor_id) {
+		case 0x1022:	// AMD
+			print_str("AMD");
+			switch (device_descriptor.device_id) {
+				case 0x2000:	// am79c973
+					print_str(":am79c973");
+					break;
+			}
+			break;
+		case 0x8086:	// Intel
+			print_str("Intel");
+			break;
+	}
+	switch (device_descriptor.class_id) {
+		case 0x03:	// graphics
+			print_str("Graphics");
+			switch (device_descriptor.subclass_id) {
+				case 0x00:	// VGA
+					print_str(":VGA");
+					break;
+			}
+			break;
+	}
+	print_str(" ");
+
+	return 0;
+}
+
 Device_descriptor Peripheral_component_interconnect_controller::get_device_descriptor(uint16_t bus, uint16_t device, uint16_t function) {
 	Device_descriptor result;
 	result.bus = bus;
@@ -79,6 +116,39 @@ Device_descriptor Peripheral_component_interconnect_controller::get_device_descr
 
 	result.revision = read(bus, device, function, 0x08);
 	result.interrupt = read(bus, device, function, 0x3C);
+
+	return result;
+}
+
+Base_address_register Peripheral_component_interconnect_controller::get_base_address_register(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar_num) {
+	Base_address_register result = {0};
+
+	uint32_t header_type = read(bus, device, function, 0x0E) & 0x7F;
+	uint8_t max_bars = 5 - (4*header_type);
+	if (bar_num > max_bars) {
+		return result;
+	}
+
+	uint32_t bar_value = read(bus, device, function, 0x10 + 4 * bar_num);
+	result.type = (bar_value & 1) ? Input_output : Memory_mapping;
+
+	if (result.type == Memory_mapping) {
+		switch ((bar_value >> 1) & 0x3) {
+			case 0b00: break;	// 32 bit mode
+			case 0b01: break;	// 20 bit mode
+			case 0b10: break;	// 64 bit mode
+			default: break;
+		}
+		result.prefetchable = ((bar_value >> 3) & 1) == 1;
+
+		uint32_t mask = ~0x7;
+		write(bus, device, function, 0x10 + 4 * bar_num, mask);
+		mask = read(bus, device, function, 0x10 + 4 * bar_num);
+		write(bus, device, function, 0x10 + 4 * bar_num, bar_value);
+	} else {
+		result.address = (uint8_t*)(bar_value & ~0x3);
+		result.prefetchable = false;
+	}
 
 	return result;
 }
