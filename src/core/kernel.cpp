@@ -31,9 +31,17 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Mouse_driver mouse_driver;
 	Peripheral_component_interconnect_controller PCI_controller;
 	PCI_controller.select_drivers();
+	Video_graphics_array vga;
 
 	interrupt_manager.activate();
 	print_str("IDT activated\n");
+
+	vga.set_mode(320, 200, 8);
+	for (uint32_t x = 0 ; x < 320 ; x++) {
+		for (uint32_t y = 0 ; y < 200 ; y++) {
+			vga.put_pixel(x, y, 0x00, 0x00, 0xA8);
+		}
+	}
 
 	while (1);
 }
