@@ -1,10 +1,10 @@
 #ifndef __INTERRUPTS_H__
 #define __INTERRUPTS_H__
 
-#include "types.h"
-#include "io.h"
-#include "port.h"
-#include "gdt.h"
+#include "utils/types.h"
+#include "utils/io.h"
+#include "hardware/port.h"
+#include "hardware/gdt.h"
 
 #define IDT_DESC_PRESENT 0x80
 #define IDT_INTERRUPT_GATE 0xE

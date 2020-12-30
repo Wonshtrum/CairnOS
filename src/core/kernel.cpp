@@ -1,8 +1,9 @@
-#include "types.h"
-#include "io.h"
-#include "gdt.h"
-#include "port.h"
-#include "interrupts.h"
+#include "utils/types.h"
+#include "utils/io.h"
+#include "hardware/gdt.h"
+#include "hardware/port.h"
+#include "hardware/interrupts.h"
+#include "hardware/pci.h"
 #include "drivers/drivers.h"
 
 
@@ -30,6 +31,8 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	//hook hardware
 	Keyboard_driver keyboard_driver;
 	Mouse_driver mouse_driver;
+	Peripheral_component_interconnect_controller PCI_controller;
+	PCI_controller.select_drivers();
 
 	interrupt_manager.activate();
 	print_str("IDT activated\n");
