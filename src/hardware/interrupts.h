@@ -5,6 +5,7 @@
 #include "utils/io.h"
 #include "hardware/port.h"
 #include "hardware/gdt.h"
+#include "core/multitasking.h"
 
 #define IDT_DESC_PRESENT 0x80
 #define IDT_INTERRUPT_GATE 0xE
@@ -25,6 +26,8 @@ public:
 class Interrupt_manager {
 friend class Interrupt_handler;
 protected:
+	static Interrupt_manager* instance;
+
 	struct Gate_descriptor {
 		uint16_t handler_addr_lo;
 		uint16_t gdt_code_segment;
@@ -52,12 +55,12 @@ protected:
 	Port_8bit_slow pic_slave_command;
 	Port_8bit_slow pic_slave_data;
 
-	static Interrupt_manager* instance;
-
 	Interrupt_handler* handlers[256];
 
+	Task_manager* task_manager;
+
 public:
-	Interrupt_manager(Global_descriptor_table* gdt);
+	Interrupt_manager(Global_descriptor_table* gdt, Task_manager* task_manager);
 	~Interrupt_manager();
 
 	static Interrupt_manager* get();

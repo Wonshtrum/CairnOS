@@ -5,6 +5,7 @@
 #include "hardware/interrupts.h"
 #include "hardware/pci.h"
 #include "drivers/all.h"
+#include "core/multitasking.h"
 
 #define GRAPHICSMODE 0
 
@@ -18,6 +19,13 @@ extern "C" void call_constructors() {
 	}
 }
 
+void task_A() {
+	while(1) print_str("A");
+}
+void task_B() {
+	while(1) print_str("B");
+}
+
 extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("Hello world!\n", true);
 	print_hex(magic_number);
@@ -25,8 +33,15 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Global_descriptor_table gdt;
 	print_str("GDT loaded\n");
 
-	Interrupt_manager interrupt_manager(&gdt);
-	print_str("IDT initialized!\n");
+	Task_manager task_manager;
+	print_str("TM created\n");
+	Task t_a(&gdt, task_A);
+	Task t_b(&gdt, task_B);
+	task_manager.add_task(&t_a);
+	task_manager.add_task(&t_b);
+
+	Interrupt_manager interrupt_manager(&gdt, &task_manager);
+	print_str("IDT initialized\n");
 
 	//hook hardware
 	Keyboard_driver keyboard_driver;

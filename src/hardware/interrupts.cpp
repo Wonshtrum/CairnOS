@@ -20,11 +20,12 @@ void Interrupt_manager::set_interrupt_descriptor_entry(
 		| ((descriptor_privilege_level & 3) << 5);
 }
 
-Interrupt_manager::Interrupt_manager(Global_descriptor_table* gdt):
+Interrupt_manager::Interrupt_manager(Global_descriptor_table* gdt, Task_manager* task_manager):
 	pic_master_command(0x20),
 	pic_master_data(0x21),
 	pic_slave_command(0xA0),
-	pic_slave_data(0xA1) {
+	pic_slave_data(0xA1),
+	task_manager(task_manager) {
 
 	instance = this;
 
@@ -76,7 +77,9 @@ uint32_t Interrupt_manager::handle_interrupt(uint8_t interrupt_number, uint32_t 
 uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32_t esp) {
 	if (handlers[interrupt_number] != 0) {
 		esp = handlers[interrupt_number]->handle(esp);
-	} else if (interrupt_number != 0x20) {
+	} else if (interrupt_number == 0x20) {
+		esp = (uint32_t)task_manager->shedule((CPU_state*)esp);
+	} else {
 		print_str("UNHANDLED INTERRUPT ");
 		print_hex(interrupt_number);
 		print_str("\n");
