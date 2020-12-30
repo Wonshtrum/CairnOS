@@ -78,17 +78,23 @@ uint8_t* Video_graphics_array::get_framebuffer_segment() {
 	}
 }
 
-void Video_graphics_array::put_pixel(uint32_t x, uint32_t y, uint8_t color_index) {
+void Video_graphics_array::put_pixel(int32_t x, int32_t y, uint8_t color_index) {
+	if (x < 0 || y < 0 || x > width || y > height) {
+		return;
+	}
 	uint8_t* pixel_address = get_framebuffer_segment() + width*y + x;
 	*pixel_address = color_index;
 }
 
 uint8_t Video_graphics_array::get_color_index(uint8_t r, uint8_t g, uint8_t b) {
-	if (r == 0 && g == 0 && b == 0xA8) {
-		return 0x01;
-	}
+	if (r == 0x00 && g == 0x00 && b == 0x00) return 0x00;	// black
+	if (r == 0x00 && g == 0x00 && b == 0xA8) return 0x01;	// blue
+	if (r == 0x00 && g == 0xA8 && b == 0x00) return 0x02;	// green
+	if (r == 0xA8 && g == 0x00 && b == 0xA8) return 0x04;	// red
+	if (r == 0xFF && g == 0xFF && b == 0xFF) return 0x3F;	// white
+	return 0x00;
 }
 
-void Video_graphics_array::put_pixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b) {
+void Video_graphics_array::put_pixel(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) {
 	put_pixel(x, y, get_color_index(r, g, b));
 }

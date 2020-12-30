@@ -42,8 +42,8 @@ public:
 
 	virtual bool set_mode(uint32_t width, uint32_t height, uint32_t color_depth);
 	virtual bool support_mode(uint32_t width, uint32_t height, uint32_t color_depth);
-	virtual void put_pixel(uint32_t x, uint32_t y, uint8_t color_index);
-	void put_pixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b);
+	virtual void put_pixel(int32_t x, int32_t y, uint8_t color_index);
+	void put_pixel(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b);
 };
 
 
