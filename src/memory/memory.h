@@ -29,8 +29,17 @@ public:
 	void* malloc(size_t size);
 	void free(void* ptr);
 
+	void diagnostic();
+
 	static Memory_mamanger* get();
 };
+
+
+void* operator new(size_t size);
+void* operator new[](size_t size);
+
+void operator delete(void* ptr);
+void operator delete[](void* ptr);
 
 
 #endif

@@ -51,27 +51,19 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_hex((*memory_upper) - heap - 10);
 	print_str("KiB\n");
 
-	print_str("\nstart: ");
-	print_hex(heap * 1024);
-	print_str("\n");
+	memory_mamanger.diagnostic();print_str("\n");
 	void* alloc1 = memory_mamanger.malloc(1024);
-	print_str("\nalloc1: ");
-	print_hex((uint32_t)alloc1);
-	print_str("\n");
+	memory_mamanger.diagnostic();print_str("\n");
 	void* alloc2 = memory_mamanger.malloc(2048);
-	print_str("\nalloc2: ");
-	print_hex((uint32_t)alloc2);
-	print_str("\n");
+	memory_mamanger.diagnostic();print_str("\n");
 	void* alloc3 = memory_mamanger.malloc(8);
-	print_str("\nalloc3: ");
-	print_hex((uint32_t)alloc3);
-	print_str("\n");
-	print_str("free1\n");
+	memory_mamanger.diagnostic();print_str("\n");
 	memory_mamanger.free(alloc3);
-	print_str("free2\n");
-	memory_mamanger.free(alloc1);
-	print_str("free3\n");
+	memory_mamanger.diagnostic();print_str("\n");
 	memory_mamanger.free(alloc2);
+	memory_mamanger.diagnostic();print_str("\n");
+	memory_mamanger.free(alloc1);
+	memory_mamanger.diagnostic();print_str("\n");
 
 #if GRAPHICSMODE
 	vga.set_mode(320, 200, 8);

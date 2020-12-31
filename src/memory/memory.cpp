@@ -30,7 +30,6 @@ void* Memory_mamanger::malloc(size_t size) {
 	Memory_chunk* result = 0;
 	Memory_chunk* chunk = first;
 	while (true) {
-		chunk->print();
 		if (!(chunk->flags & ALLOCATED) && chunk->size >= size) {
 			result = chunk;
 			break;
@@ -53,10 +52,8 @@ void* Memory_mamanger::malloc(size_t size) {
 		new_chunk->size = result->size - size - sizeof(Memory_chunk);
 		result->size = size;
 		result->flags = HAS_NEXT;
-		new_chunk->print();
 	}
 	result->flags |= ALLOCATED;
-	result->print();
 
 	return (void*)((size_t)result + sizeof(Memory_chunk));
 }
@@ -75,23 +72,34 @@ void Memory_mamanger::free(void* ptr) {
 			size += sizeof(Memory_chunk) + next_chunk->size;	// grows forwards
 			flags &= next_chunk->flags;				// takes new HAS_NEXT
 			if (flags & HAS_NEXT) {
-				next_chunk += sizeof(Memory_chunk) + next_chunk->size;
+				next_chunk = (Memory_chunk*)((size_t)chunk + sizeof(Memory_chunk) + size);
 			}
 		}
 		next_chunk->link = chunk;
 	}
 	chunk->size = size;
 	chunk->flags = flags;
+}
 
-	if (chunk->link) {
-		print_str("/");
-		chunk->link->print();
+void Memory_mamanger::diagnostic() {
+	Memory_chunk* chunk = first;
+	for (; chunk->flags & HAS_NEXT ; chunk = (Memory_chunk*)((size_t)chunk + chunk->size + sizeof(Memory_chunk))) {
+		chunk->print();
 	}
-	print_str(" ");
 	chunk->print();
-	if (chunk->flags & HAS_NEXT) {
-		Memory_chunk* next_chunk = (Memory_chunk*)((size_t)chunk + sizeof(Memory_chunk) + size);
-		print_str("\\");
-		next_chunk->print();
-	}
+}
+
+void* operator new(size_t size) {
+	return Memory_mamanger::get()->malloc(size);
+}
+void* operator new[](size_t size) {
+	return Memory_mamanger::get()->malloc(size);
+}
+
+void operator delete(void* ptr) {
+	return Memory_mamanger::get()->free(ptr);
+}
+
+void operator delete[](void* ptr) {
+	return Memory_mamanger::get()->free(ptr);
 }
