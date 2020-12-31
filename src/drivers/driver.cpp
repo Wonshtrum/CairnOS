@@ -34,3 +34,7 @@ void Driver_manager::activate_all() {
 	print_hex((uint8_t)num_drivers);
 	print_str(" DRIVER(S) ACTIVATED\n");
 }
+
+Driver* Driver_manager::debug_get(uint32_t index) {
+	return drivers[index];
+}

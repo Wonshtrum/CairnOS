@@ -49,6 +49,9 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 
 	driver_manager.activate_all();
 
+	Driver_am79c973* eth0 = (Driver_am79c973*)driver_manager.debug_get(0);
+	eth0->send((uint8_t*)"Hello Network", 13);
+
 #if GRAPHICSMODE
 	Video_graphics_array vga;
 	vga.set_mode(320, 200, 8);
