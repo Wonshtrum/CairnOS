@@ -44,6 +44,12 @@ void print_str(char* str, bool clear) {
 	}
 }
 
+static char* chr_template = "*";
+void print_chr(char chr) {
+	chr_template[0] = chr;
+	print_str(chr_template);
+}
+
 static char* hex_table = "0123456789abcdef";
 static char* hex_template = "0x****************G";
 #define PRINT_HEX(N) void print_hex(uint##N##_t n) {\
