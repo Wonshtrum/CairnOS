@@ -34,9 +34,43 @@ Interrupt_manager::Interrupt_manager(Global_descriptor_table* gdt, Task_manager*
 		handlers[interrupt_number] = 0;
 		set_interrupt_descriptor_entry(interrupt_number, code_segment, &ignore_interrupt, 0, IDT_INTERRUPT_GATE);
 	}
-	set_interrupt_descriptor_entry(0x20, code_segment, &handle_interrupt_0x00, 0, IDT_INTERRUPT_GATE);
-	set_interrupt_descriptor_entry(0x21, code_segment, &handle_interrupt_0x01, 0, IDT_INTERRUPT_GATE);
-	set_interrupt_descriptor_entry(0x2C, code_segment, &handle_interrupt_0x0C, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x00, code_segment, &handle_exception_0x00, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x01, code_segment, &handle_exception_0x01, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x02, code_segment, &handle_exception_0x02, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x03, code_segment, &handle_exception_0x03, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x04, code_segment, &handle_exception_0x04, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x05, code_segment, &handle_exception_0x05, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x06, code_segment, &handle_exception_0x06, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x07, code_segment, &handle_exception_0x07, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x08, code_segment, &handle_exception_0x08, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x09, code_segment, &handle_exception_0x09, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0A, code_segment, &handle_exception_0x0A, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0B, code_segment, &handle_exception_0x0B, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0C, code_segment, &handle_exception_0x0C, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0D, code_segment, &handle_exception_0x0D, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0E, code_segment, &handle_exception_0x0E, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0F, code_segment, &handle_exception_0x0F, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x10, code_segment, &handle_exception_0x10, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x11, code_segment, &handle_exception_0x11, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x12, code_segment, &handle_exception_0x12, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x13, code_segment, &handle_exception_0x13, 0, IDT_INTERRUPT_GATE);
+
+	set_interrupt_descriptor_entry(0x00 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x00, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x01 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x01, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x02 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x02, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x03 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x03, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x04 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x04, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x05 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x05, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x06 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x06, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x07 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x07, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x08 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x08, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x09 + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x09, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0A + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0A, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0B + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0B, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0C + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0C, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0D + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0D, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0E + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0E, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x0F + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0F, 0, IDT_INTERRUPT_GATE);
 
 	pic_master_command.write(0x11);	// Master init
 	pic_slave_command.write(0x11);	// Slave init
@@ -77,7 +111,7 @@ uint32_t Interrupt_manager::handle_interrupt(uint8_t interrupt_number, uint32_t 
 uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32_t esp) {
 	if (handlers[interrupt_number] != 0) {
 		esp = handlers[interrupt_number]->handle(esp);
-	} else if (interrupt_number == 0x20) {
+	} else if (interrupt_number == INTERRUPT_OFFSET) {
 		esp = (uint32_t)task_manager->shedule((CPU_state*)esp);
 	} else {
 		print_str("UNHANDLED INTERRUPT ");
@@ -85,9 +119,9 @@ uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32
 		print_str("\n");
 	}
 
-	if (0x20 <= interrupt_number && interrupt_number < 0x30) {
+	if (INTERRUPT_OFFSET <= interrupt_number && interrupt_number < INTERRUPT_OFFSET + 0x10) {
 		pic_master_command.write(0x20);
-		if (interrupt_number >= 0x28) {
+		if (interrupt_number >= INTERRUPT_OFFSET + 0x08) {
 			pic_slave_command.write(0x20);
 		}
 	}

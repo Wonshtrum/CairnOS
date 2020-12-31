@@ -1,4 +1,5 @@
 #include "pci.h"
+#include "drivers/am79c973.h"
 
 
 Peripheral_component_interconnect_controller::Peripheral_component_interconnect_controller():
@@ -50,7 +51,11 @@ void Peripheral_component_interconnect_controller::select_drivers() {
 					if (bar.address && (bar.type == Input_output)) {
 						device_descriptor.port_base = (uint32_t)bar.address;
 					}
-					Driver* driver = get_driver(device_descriptor);
+				}
+				Driver* driver = get_driver(device_descriptor);
+				if (driver != 0) {
+					print_str("-> DRIVER FOUND AND LOADED!");
+					Driver_manager::get()->add_driver(driver);
 				}
 
 				print_str("\n  BUS ");
@@ -73,12 +78,14 @@ void Peripheral_component_interconnect_controller::select_drivers() {
 }
 
 Driver* Peripheral_component_interconnect_controller::get_driver(Device_descriptor device_descriptor) {
+	Driver* driver = 0;
 	switch (device_descriptor.vendor_id) {
 		case 0x1022:	// AMD
 			print_str("AMD");
 			switch (device_descriptor.device_id) {
 				case 0x2000:	// am79c973
 					print_str(":am79c973");
+					driver = new Driver_am79c973(&device_descriptor);
 					break;
 			}
 			break;
@@ -98,7 +105,7 @@ Driver* Peripheral_component_interconnect_controller::get_driver(Device_descript
 	}
 	print_str(" ");
 
-	return 0;
+	return driver;
 }
 
 Device_descriptor Peripheral_component_interconnect_controller::get_device_descriptor(uint16_t bus, uint16_t device, uint16_t function) {

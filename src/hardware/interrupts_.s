@@ -20,9 +20,43 @@
 		jmp interrupt_handler_call
 .endm
 
+handle_exception 0x00
+handle_exception 0x01
+handle_exception 0x02
+handle_exception 0x03
+handle_exception 0x04
+handle_exception 0x05
+handle_exception 0x06
+handle_exception 0x07
+handle_exception 0x08
+handle_exception 0x09
+handle_exception 0x0A
+handle_exception 0x0B
+handle_exception 0x0C
+handle_exception 0x0D
+handle_exception 0x0E
+handle_exception 0x0F
+handle_exception 0x10
+handle_exception 0x11
+handle_exception 0x12
+handle_exception 0x13
+
 handle_interrupt 0x00
 handle_interrupt 0x01
+handle_interrupt 0x02
+handle_interrupt 0x03
+handle_interrupt 0x04
+handle_interrupt 0x05
+handle_interrupt 0x06
+handle_interrupt 0x07
+handle_interrupt 0x08
+handle_interrupt 0x09
+handle_interrupt 0x0A
+handle_interrupt 0x0B
 handle_interrupt 0x0C
+handle_interrupt 0x0D
+handle_interrupt 0x0E
+handle_interrupt 0x0F
 
 interrupt_handler_call:
 	/*

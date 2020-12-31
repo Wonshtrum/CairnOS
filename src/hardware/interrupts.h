@@ -9,7 +9,7 @@
 
 #define IDT_DESC_PRESENT 0x80
 #define IDT_INTERRUPT_GATE 0xE
-
+#define INTERRUPT_OFFSET 0x20
 
 class Interrupt_handler {
 protected:
@@ -71,9 +71,44 @@ public:
 	uint32_t do_handle_interrupt(uint8_t interrupt_number, uint32_t esp);
 
 	static void ignore_interrupt();
+
+	static void handle_exception_0x00();
+	static void handle_exception_0x01();
+	static void handle_exception_0x02();
+	static void handle_exception_0x03();
+	static void handle_exception_0x04();
+	static void handle_exception_0x05();
+	static void handle_exception_0x06();
+	static void handle_exception_0x07();
+	static void handle_exception_0x08();
+	static void handle_exception_0x09();
+	static void handle_exception_0x0A();
+	static void handle_exception_0x0B();
+	static void handle_exception_0x0C();
+	static void handle_exception_0x0D();
+	static void handle_exception_0x0E();
+	static void handle_exception_0x0F();
+	static void handle_exception_0x10();
+	static void handle_exception_0x11();
+	static void handle_exception_0x12();
+	static void handle_exception_0x13();
+
 	static void handle_interrupt_0x00();
 	static void handle_interrupt_0x01();
+	static void handle_interrupt_0x02();
+	static void handle_interrupt_0x03();
+	static void handle_interrupt_0x04();
+	static void handle_interrupt_0x05();
+	static void handle_interrupt_0x06();
+	static void handle_interrupt_0x07();
+	static void handle_interrupt_0x08();
+	static void handle_interrupt_0x09();
+	static void handle_interrupt_0x0A();
+	static void handle_interrupt_0x0B();
 	static void handle_interrupt_0x0C();
+	static void handle_interrupt_0x0D();
+	static void handle_interrupt_0x0E();
+	static void handle_interrupt_0x0F();
 };
 
 

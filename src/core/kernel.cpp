@@ -32,6 +32,9 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Memory_mamanger memory_mamanger(heap * 1024, ((*memory_upper) - heap - 10) * 1024);
 	print_str("Memory mamanger created\n");
 
+	Driver_manager driver_manager;
+	print_str("Driver mamanger created\n");
+
 	Task_manager task_manager;
 	print_str("Task manager created\n");
 
@@ -43,29 +46,11 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Mouse_driver mouse_driver;
 	Peripheral_component_interconnect_controller PCI_controller;
 	PCI_controller.select_drivers();
-	Video_graphics_array vga;
 
-	print_str("MEM: ");
-	print_hex(*memory_upper);
-	print_str("KiB\nHEAP: ");
-	print_hex((*memory_upper) - heap - 10);
-	print_str("KiB\n");
-
-	memory_mamanger.diagnostic();print_str("\n");
-	void* alloc1 = memory_mamanger.malloc(1024);
-	memory_mamanger.diagnostic();print_str("\n");
-	void* alloc2 = memory_mamanger.malloc(2048);
-	memory_mamanger.diagnostic();print_str("\n");
-	void* alloc3 = memory_mamanger.malloc(8);
-	memory_mamanger.diagnostic();print_str("\n");
-	memory_mamanger.free(alloc3);
-	memory_mamanger.diagnostic();print_str("\n");
-	memory_mamanger.free(alloc2);
-	memory_mamanger.diagnostic();print_str("\n");
-	memory_mamanger.free(alloc1);
-	memory_mamanger.diagnostic();print_str("\n");
+	driver_manager.activate_all();
 
 #if GRAPHICSMODE
+	Video_graphics_array vga;
 	vga.set_mode(320, 200, 8);
 	for (uint32_t x = 0 ; x < 320 ; x++) {
 		for (uint32_t y = 0 ; y < 200 ; y++) {
