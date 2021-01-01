@@ -5,12 +5,27 @@
 #include "utils/io.h"
 #include "hardware/port.h"
 #include "drivers/driver.h"
+#include "gui/graphicsContext.h"
 
 #define	VGA_NUM_SEQ_REGS	5
 #define	VGA_NUM_CRTC_REGS	25
 #define	VGA_NUM_GC_REGS		9
 #define	VGA_NUM_AC_REGS		21
 #define	VGA_NUM_REGS		1+VGA_NUM_SEQ_REGS+VGA_NUM_CRTC_REGS+VGA_NUM_GC_REGS+VGA_NUM_AC_REGS
+
+
+class Driver_VGA;
+class GC_VGA: public Graphics_context {
+friend class Driver_VGA;
+private:
+	Driver_VGA* vga;
+
+public:
+	GC_VGA(Driver_VGA* vga);
+	~GC_VGA();
+
+	virtual void put_pixel(int32_t x, int32_t y, Color color) override;
+};
 
 
 class Driver_VGA: public Driver {
@@ -31,6 +46,8 @@ protected:
 	uint32_t height;
 	uint32_t color_depth;
 
+	GC_VGA graphics_context;
+
 	void write_registers(uint8_t* registers);
 	uint8_t* get_framebuffer_segment();
 
@@ -41,6 +58,7 @@ public:
 	~Driver_VGA();
 
 	virtual char* get_name() override;
+	GC_VGA* get_graphics_context();
 
 	virtual bool set_mode(uint32_t width, uint32_t height, uint32_t color_depth);
 	virtual bool support_mode(uint32_t width, uint32_t height, uint32_t color_depth);

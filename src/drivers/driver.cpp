@@ -20,7 +20,7 @@ Driver_manager* Driver_manager::get() {
 }
 
 bool Driver_manager::add_driver(Driver* driver) {
-	if (num_drivers >= MAX_NUM_DRIVERS - 1) {
+	if (num_drivers >= MAX_NUM_DRIVERS) {
 		return false;
 	}
 	drivers[num_drivers++] = driver;

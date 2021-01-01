@@ -13,10 +13,12 @@ Driver_VGA::Driver_VGA():
 	attribute_controller_index_port(0x3C0),
 	attribute_controller_read_port(0x3C1),
 	attribute_controller_write_port(0x3C0),
-	attribute_controller_reset_port(0x3DA) {}
+	attribute_controller_reset_port(0x3DA),
+	graphics_context(this) {}
 Driver_VGA::~Driver_VGA() {}
 
 char* Driver_VGA::get_name() { return "VGA"; }
+GC_VGA* Driver_VGA::get_graphics_context() { return &graphics_context; }
 
 void Driver_VGA::write_registers(uint8_t* registers) {
 	misc_port.write(*(registers++));
@@ -71,6 +73,9 @@ bool Driver_VGA::set_mode(uint32_t width, uint32_t height, uint32_t color_depth)
 	this->width = width;
 	this->height = width;
 	this->color_depth = color_depth;
+	
+	graphics_context.width = width;
+	graphics_context.height = height;
 
 	write_registers(g_init);
 	return true;
@@ -109,4 +114,12 @@ uint8_t Driver_VGA::get_color_index(uint8_t r, uint8_t g, uint8_t b) {
 
 void Driver_VGA::put_pixel(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) {
 	put_pixel(x, y, get_color_index(r, g, b));
+}
+
+
+GC_VGA::GC_VGA(Driver_VGA* vga): Graphics_context(0, 0), vga(vga) {}
+GC_VGA::~GC_VGA() {}
+
+void GC_VGA::put_pixel(int32_t x, int32_t y, Color color) {
+	vga->put_pixel(x, y, color.r, color.g, color.b);
 }

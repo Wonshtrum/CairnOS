@@ -32,7 +32,7 @@ Task_manager::Task_manager(): num_tasks(0), current_task(-1) {}
 Task_manager::~Task_manager() {}
 
 bool Task_manager::add_task(Task* task) {
-	if (num_tasks >= MAX_NUM_TASKS-1) {
+	if (num_tasks >= MAX_NUM_TASKS) {
 		return false;
 	}
 	tasks[num_tasks++] = task;
