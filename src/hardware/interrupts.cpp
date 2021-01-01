@@ -110,7 +110,7 @@ uint32_t Interrupt_manager::handle_interrupt(uint8_t interrupt_number, uint32_t 
 
 uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32_t esp) {
 	if (handlers[interrupt_number] != 0) {
-		esp = handlers[interrupt_number]->handle(esp);
+		handlers[interrupt_number]->handle();
 	} else if (interrupt_number == INTERRUPT_OFFSET) {
 		esp = (uint32_t)task_manager->shedule((CPU_state*)esp);
 	} else {
@@ -139,6 +139,4 @@ Interrupt_handler::~Interrupt_handler() {
 		Interrupt_manager::get()->handlers[interrupt_number] = 0;
 	}
 }
-uint32_t Interrupt_handler::handle(uint32_t esp) {
-	return esp;
-}
+void Interrupt_handler::handle() {}

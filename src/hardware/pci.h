@@ -54,7 +54,7 @@ public:
 	void write(uint16_t bus, uint16_t device, uint16_t function, uint32_t register_offset, uint32_t value);
 	bool device_has_functions(uint16_t bus, uint16_t device);
 
-	void select_drivers();
+	void select_drivers(uint8_t verbose = 0);
 	Driver* get_driver(Device_descriptor device_descriptor);
 	Device_descriptor get_device_descriptor(uint16_t bus, uint16_t device, uint16_t function);
 	Base_address_register get_base_address_register(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar_num);

@@ -70,8 +70,9 @@ Driver_am79c973::Driver_am79c973(Device_descriptor* dev):
 	register_addr_port.write(2);
 	register_data_port.write(((uint32_t)(&init) >> 16) & 0xFFFF);
 }
-
 Driver_am79c973::~Driver_am79c973() {}
+
+char* Driver_am79c973::get_name() { return "AMD am79c973"; }
 
 void Driver_am79c973::activate() {
 	register_addr_port.write(0);
@@ -92,7 +93,7 @@ uint32_t Driver_am79c973::reset() {
 	return 10;
 }
 
-uint32_t Driver_am79c973::handle(uint32_t esp) {
+void Driver_am79c973::handle() {
 	print_str("INTERRUPT FROM AMD am79c973 (");
 	print_hex(init.physical_addr);
 	print_str(")\n");
@@ -110,9 +111,6 @@ uint32_t Driver_am79c973::handle(uint32_t esp) {
 	// acknoledge
 	register_addr_port.write(0);
 	register_data_port.write(temp);
-	
-
-	return esp;
 }
 
 void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {

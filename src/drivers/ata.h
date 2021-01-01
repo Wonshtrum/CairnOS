@@ -25,7 +25,7 @@ protected:
 public:
 	Driver_ATA(uint16_t port_base, bool master);
 	~Driver_ATA();
-
+	
 	void identify();
 	void read_28(uint32_t sector, uint8_t* data, uint32_t count);
 	void write_28(uint32_t sector, uint8_t* data, uint32_t count);

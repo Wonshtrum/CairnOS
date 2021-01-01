@@ -6,6 +6,7 @@
 #include "hardware/interrupts.h"
 #include "hardware/pci.h"
 #include "drivers/all.h"
+#include "core/handlers/all.h"
 #include "core/multitasking.h"
 
 #define GRAPHICSMODE 0
@@ -42,13 +43,23 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("IDT initialized\n");
 
 	//hook hardware
-	Keyboard_driver keyboard_driver;
-	Mouse_driver mouse_driver;
+	
+	Print_keyboard keyboard_handler;
+	Driver_keyboard keyboard(&keyboard_handler);
+	driver_manager.add_driver(&keyboard);
+
+	Text_mode_mouse mouse_handler(80, 25);
+	Driver_mouse mouse(&mouse_handler);
+	driver_manager.add_driver(&mouse);
+
+	print_str("\n");
 	Peripheral_component_interconnect_controller PCI_controller;
-	PCI_controller.select_drivers();
+	PCI_controller.select_drivers(2);
+	print_str("\n");
 
 	driver_manager.activate_all();
-
+	print_str("\n");
+/*
 	// interrupt 14
 	Driver_ATA ata0m(0x1F0, true);
 	print_str("\nATA primary master: ");
@@ -71,7 +82,7 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Driver_ATA ata1s(0x170, false);
 	// third: 0x1E8
 	// fourth: 0x168
-
+*/
 #if GRAPHICSMODE
 	Video_graphics_array vga;
 	vga.set_mode(320, 200, 8);

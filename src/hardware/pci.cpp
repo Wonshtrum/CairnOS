@@ -9,8 +9,7 @@ Peripheral_component_interconnect_controller::Peripheral_component_interconnect_
 Peripheral_component_interconnect_controller::~Peripheral_component_interconnect_controller() {}
 
 uint32_t Peripheral_component_interconnect_controller::read(uint16_t bus, uint16_t device, uint16_t function, uint32_t register_offset) {
-	uint32_t id =
-		1 << 31
+	uint32_t id = 1 << 31
 		| ((bus & 0xFF) << 16)
 		| ((device & 0x1F) << 11)
 		| ((function & 0x07) << 8)
@@ -20,8 +19,7 @@ uint32_t Peripheral_component_interconnect_controller::read(uint16_t bus, uint16
 }
 
 void Peripheral_component_interconnect_controller::write(uint16_t bus, uint16_t device, uint16_t function, uint32_t register_offset, uint32_t value) {
-	uint32_t id =
-		1 << 31
+	uint32_t id = 1 << 31
 		| ((bus & 0xFF) << 16)
 		| ((device & 0x1F) << 11)
 		| ((function & 0x07) << 8)
@@ -34,8 +32,7 @@ bool Peripheral_component_interconnect_controller::device_has_functions(uint16_t
 	return read(bus, device, 0, 0x0E) & (1 << 7);
 }
 
-void Peripheral_component_interconnect_controller::select_drivers() {
-	print_str("\n");
+void Peripheral_component_interconnect_controller::select_drivers(uint8_t verbose) {
 	for (uint8_t bus = 0 ; bus < 8 ; bus++) {
 		for (uint8_t device = 0 ; device < 32 ; device++) {
 			uint8_t num_functions = device_has_functions(bus, device) ? 8 : 1;
@@ -54,57 +51,55 @@ void Peripheral_component_interconnect_controller::select_drivers() {
 				}
 				Driver* driver = get_driver(device_descriptor);
 				if (driver != 0) {
-					print_str("-> DRIVER FOUND AND LOADED!");
+					if (verbose > 0) {
+						print_str(driver->get_name());
+						print_str(" -> DRIVER FOUND AND LOADED!\n");
+					}
 					Driver_manager::get()->add_driver(driver);
 				}
-
-				print_str("\n  BUS ");
-				print_hex(bus);
-				print_str(", DEV ");
-				print_hex(device);
-				print_str(", FUN ");
-				print_hex(function);
-				print_str(", VEN");
-				print_hex(device_descriptor.vendor_id);
-				print_str(", DEV");
-				print_hex(device_descriptor.device_id);
-				print_str(", INT");
-				print_hex(device_descriptor.interrupt);
-				print_str("\n");
+				if (verbose > 1) {
+					print_str("  BUS");
+					print_hex(bus);
+					print_str(", DEV");
+					print_hex(device);
+					print_str(", FUN");
+					print_hex(function);
+					print_str(", VEN");
+					print_hex(device_descriptor.vendor_id);
+					print_str(", DEV");
+					print_hex(device_descriptor.device_id);
+					print_str(", INT");
+					print_hex(device_descriptor.interrupt);
+					print_str(", PRT");
+					print_hex(device_descriptor.port_base);
+					print_str("\n");
+				}
 			}
 		}
 	}
-	print_str("\n");
 }
 
 Driver* Peripheral_component_interconnect_controller::get_driver(Device_descriptor device_descriptor) {
 	Driver* driver = 0;
 	switch (device_descriptor.vendor_id) {
 		case 0x1022:	// AMD
-			print_str("AMD");
 			switch (device_descriptor.device_id) {
 				case 0x2000:	// am79c973
-					print_str(":am79c973");
 					driver = new Driver_am79c973(&device_descriptor);
 					break;
 			}
 			break;
 		case 0x8086:	// Intel
-			print_str("Intel");
 			break;
 	}
 	switch (device_descriptor.class_id) {
 		case 0x03:	// graphics
-			print_str("Graphics");
 			switch (device_descriptor.subclass_id) {
 				case 0x00:	// VGA
-					print_str(":VGA");
 					break;
 			}
 			break;
 	}
-	print_str(" ");
-
 	return driver;
 }
 

@@ -8,7 +8,7 @@
 #include "hardware/pci.h"
 
 
-class Driver_am79c973 : public Driver, public Interrupt_handler {
+class Driver_am79c973: public Driver, public Interrupt_handler {
 private:
 	struct Buffer_descriptor {
 		uint32_t address;
@@ -54,10 +54,12 @@ public:
 	Driver_am79c973(Device_descriptor* dev);
 	~Driver_am79c973();
 
+	virtual char* get_name() override;
+
 	virtual void activate() override;
 	virtual uint32_t reset() override;
 
-	virtual uint32_t handle(uint32_t esp) override;
+	virtual void handle() override;
 
 	void send(uint8_t* buffer, uint32_t size);
 	void receive();

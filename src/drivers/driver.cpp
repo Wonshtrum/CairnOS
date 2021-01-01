@@ -1,12 +1,12 @@
 #include "driver.h"
 
 
-Driver::Driver() {}
+Driver::Driver(): activated(false) {}
 Driver::~Driver() {}
-void Driver::activate() {}
+void Driver::activate() { activated = true; }
 uint32_t Driver::reset() { return 0; }
-void Driver::deactivate() {}
-
+void Driver::deactivate() { activated = false; }
+char* Driver::get_name() { return "Unnamed driver"; }
 
 Driver_manager* Driver_manager::instance;
 Driver_manager::Driver_manager() {
@@ -31,8 +31,14 @@ void Driver_manager::activate_all() {
 	for (uint32_t i = 0 ; i < num_drivers ; i++) {
 		drivers[i]->activate();
 	}
+
 	print_hex((uint8_t)num_drivers);
-	print_str(" DRIVER(S) ACTIVATED\n");
+	print_str(" DRIVER(S) ACTIVATED:\n");
+	for (uint32_t i = 0 ; i < num_drivers ; i++) {
+		print_str(" - ");
+		print_str(drivers[i]->get_name());
+		print_str("\n");
+	}
 }
 
 Driver* Driver_manager::debug_get(uint32_t index) {

@@ -19,7 +19,7 @@ protected:
 	~Interrupt_handler();
 
 public:
-	virtual uint32_t handle(uint32_t esp);
+	virtual void handle();
 };
 
 

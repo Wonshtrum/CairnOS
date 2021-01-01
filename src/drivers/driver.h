@@ -8,9 +8,14 @@
 
 
 class Driver {
+protected:
+	bool activated;
+
 public:
 	Driver();
 	~Driver();
+	
+	virtual char* get_name();
 
 	virtual void activate();
 	virtual uint32_t reset();

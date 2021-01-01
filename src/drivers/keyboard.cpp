@@ -1,11 +1,25 @@
 #include "keyboard.h"
 
 
-Keyboard_driver::Keyboard_driver():
+Keyboard_event_handler::Keyboard_event_handler() {}
+Keyboard_event_handler::~Keyboard_event_handler() {}
+void Keyboard_event_handler::on_activate() {}
+void Keyboard_event_handler::on_deactivate() {}
+void Keyboard_event_handler::on_key_down(char key) {}
+void Keyboard_event_handler::on_key_up(char key) {}
+
+
+Driver_keyboard::Driver_keyboard(Keyboard_event_handler* handler):
+	Driver(),
 	Interrupt_handler(0x21),
 	data_port(0x60),
-	command_port(0x64) {
+	command_port(0x64),
+	handler(handler) {}
+Driver_keyboard::~Driver_keyboard() {}
 
+char* Driver_keyboard::get_name() { return "Keyboard"; }
+
+void Driver_keyboard::activate() {
 	while (command_port.read() & 0x1) {
 		data_port.read();
 	}
@@ -17,18 +31,35 @@ Keyboard_driver::Keyboard_driver():
 	data_port.write(status);
 
 	data_port.write(0xF4);
-}
-Keyboard_driver::~Keyboard_driver() {}
 
-uint32_t Keyboard_driver::handle(uint32_t esp) {
-	uint8_t key = data_port.read();
-	bool pressed = (key & 0x80) == 0;
-	if (pressed) {
-		print_str(" P");
-	} else {
-		print_str(" R");
+	activated = true;
+	if (handler == 0) {
+		handler->on_activate();
 	}
+}
+
+void Driver_keyboard::handle() {
+	uint8_t key = data_port.read();
+
+	if (handler == 0) {
+		return;
+	}
+
+	bool pressed = (key & 0x80) == 0;
 	key &= 0x7F;
-	print_hex(key);
-	return esp;
+	if (pressed) {
+		handler->on_key_down(key);
+	} else {
+		handler->on_key_up(key);
+	}
+}
+
+void Driver_keyboard::set_event_handler(Keyboard_event_handler* handler) {
+	if (this->handler != 0) {
+		this->handler->on_deactivate();
+	}
+	this->handler = handler;
+	if (activated && handler != 0) {
+		handler->on_activate();
+	}
 }
