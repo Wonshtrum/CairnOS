@@ -9,7 +9,7 @@
 #include "core/handlers/all.h"
 #include "core/multitasking.h"
 
-#define GRAPHICSMODE 0
+#define GRAPHICSMODE 1
 
 
 typedef void (*constructor)();
@@ -52,13 +52,14 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Driver_mouse mouse(&mouse_handler);
 	driver_manager.add_driver(&mouse);
 
+	Driver_VGA vga;
+	driver_manager.add_driver(&vga);
+
 	print_str("\n");
 	Peripheral_component_interconnect_controller PCI_controller;
 	PCI_controller.select_drivers(2);
 	print_str("\n");
 
-	driver_manager.activate_all();
-	print_str("\n");
 /*
 	// interrupt 14
 	Driver_ATA ata0m(0x1F0, true);
@@ -83,15 +84,32 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	// third: 0x1E8
 	// fourth: 0x168
 */
-#if GRAPHICSMODE
-	Video_graphics_array vga;
-	vga.set_mode(320, 200, 8);
+
+	uint32_t g_modes[][3] = {
+		{ 40, 25, 0 },
+		{ 40, 50, 0 },
+		{ 80, 25, 0 },
+		{ 80, 50, 0 },
+		{ 90, 30, 0 },
+		{ 90, 60, 0 },
+		{ 640, 480, 2 },
+		{ 320, 200, 4 },
+		{ 640, 480, 16 },
+		{ 720, 480, 16 },
+		{ 320, 200, 256 }
+	};
+
+	uint8_t mode = 2;
+	vga.set_mode(g_modes[mode][0], g_modes[mode][1], g_modes[mode][2]);
+
 	for (uint32_t x = 0 ; x < 320 ; x++) {
 		for (uint32_t y = 0 ; y < 200 ; y++) {
 			vga.put_pixel(x, y, 0x00, 0x00, 0xA8);
 		}
 	}
-#endif
+
+	driver_manager.activate_all();
+	print_str("\n");
 
 	interrupt_manager.activate();
 	print_str("\nIDT activated\n");

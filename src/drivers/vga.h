@@ -13,7 +13,7 @@
 #define	VGA_NUM_REGS		1+VGA_NUM_SEQ_REGS+VGA_NUM_CRTC_REGS+VGA_NUM_GC_REGS+VGA_NUM_AC_REGS
 
 
-class Video_graphics_array {
+class Driver_VGA: public Driver {
 protected:
 	Port_8bit misc_port;
 	Port_8bit crtc_index_port;
@@ -37,8 +37,10 @@ protected:
 	virtual uint8_t get_color_index(uint8_t r, uint8_t g, uint8_t b);
 
 public:
-	Video_graphics_array();
-	~Video_graphics_array();
+	Driver_VGA();
+	~Driver_VGA();
+
+	virtual char* get_name() override;
 
 	virtual bool set_mode(uint32_t width, uint32_t height, uint32_t color_depth);
 	virtual bool support_mode(uint32_t width, uint32_t height, uint32_t color_depth);
