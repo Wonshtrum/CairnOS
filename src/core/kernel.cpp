@@ -8,7 +8,7 @@
 #include "drivers/all.h"
 #include "core/handlers/all.h"
 #include "core/multitasking.h"
-#include "gui/gui.h"
+#include "gui/all.h"
 
 #define GRAPHICSMODE 1
 
@@ -103,16 +103,16 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	uint8_t mode = 10; //2 10
 	vga.set_mode(g_modes[mode][0], g_modes[mode][1], g_modes[mode][2]);
 	Graphics_context* ctx = vga.get_graphics_context();
-	Composite_widget bg(0, 0, ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
-	Composite_widget f1(5, 5, 100, 50, {0, 0, 0});
-	Composite_widget f2(70, 40, 120, 80, {0, 0xA8, 0});
-	Composite_widget w1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
-	bg.add_child(&f1);
-	bg.add_child(&f2);
-	f1.add_child(&w1);
-	f2.add_child(&w1);
+	Desktop desktop(ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
+	Window w1(5, 5, 100, 50, {0, 0, 0});
+	Window w2(70, 40, 120, 80, {0, 0xA8, 0});
+	Composite_widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
+	desktop.add_child(&w1);
+	desktop.add_child(&w2);
+	w2.add_child(&f1);
+	w1.add_child(&f1);
 
-	bg.draw(ctx);
+	mouse.set_event_handler(&desktop);
 
 	driver_manager.activate_all();
 	print_str("\n");
@@ -120,5 +120,7 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	interrupt_manager.activate();
 	print_str("\nIDT activated\n");
 
-	while (1);
+	while (true) {
+		desktop.draw(ctx);
+	}
 }

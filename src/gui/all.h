@@ -1,3 +1,5 @@
 #include "color.h"
 #include "widget.h"
 #include "graphicsContext.h"
+#include "desktop.h"
+#include "window.h"
