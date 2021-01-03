@@ -38,11 +38,11 @@ void Driver_keyboard::activate() {
 	}
 }
 
-void Driver_keyboard::handle() {
+uint32_t Driver_keyboard::handle(uint32_t esp) {
 	uint8_t key = data_port.read();
 
 	if (handler == 0) {
-		return;
+		return esp;
 	}
 
 	bool pressed = (key & 0x80) == 0;
@@ -52,6 +52,8 @@ void Driver_keyboard::handle() {
 	} else {
 		handler->on_key_up(key);
 	}
+
+	return esp;
 }
 
 void Driver_keyboard::set_event_handler(Keyboard_event_handler* handler) {

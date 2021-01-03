@@ -5,7 +5,7 @@
 #include "utils/io.h"
 #include "hardware/port.h"
 #include "hardware/gdt.h"
-#include "core/multitasking.h"
+#include "core/system/multitasking.h"
 
 #define IDT_DESC_PRESENT 0x80
 #define IDT_INTERRUPT_GATE 0xE
@@ -19,7 +19,7 @@ protected:
 	~Interrupt_handler();
 
 public:
-	virtual void handle();
+	virtual uint32_t handle(uint32_t esp);
 };
 
 
@@ -109,6 +109,7 @@ public:
 	static void handle_interrupt_0x0D();
 	static void handle_interrupt_0x0E();
 	static void handle_interrupt_0x0F();
+	static void handle_interrupt_0x80();
 };
 
 

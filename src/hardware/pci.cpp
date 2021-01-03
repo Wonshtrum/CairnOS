@@ -96,6 +96,7 @@ Driver* Peripheral_component_interconnect_controller::get_driver(Device_descript
 		case 0x03:	// graphics
 			switch (device_descriptor.subclass_id) {
 				case 0x00:	// VGA
+					print_str("VGA Graphics\n");
 					break;
 			}
 			break;

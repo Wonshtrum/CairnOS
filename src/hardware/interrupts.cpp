@@ -14,8 +14,8 @@ void Interrupt_manager::set_interrupt_descriptor_entry(
 	interrupt_descriptor_table[interrupt_number].handler_addr_hi = (((uint32_t)handler) >> 16) & 0xFFFF;
 	interrupt_descriptor_table[interrupt_number].gdt_code_segment = gdt_code_segment;
 	interrupt_descriptor_table[interrupt_number].reserved = 0;
-	interrupt_descriptor_table[interrupt_number].access =
-		  IDT_DESC_PRESENT
+	interrupt_descriptor_table[interrupt_number].access = 0
+		| IDT_DESC_PRESENT
 		| descriptor_type
 		| ((descriptor_privilege_level & 3) << 5);
 }
@@ -71,6 +71,7 @@ Interrupt_manager::Interrupt_manager(Global_descriptor_table* gdt, Task_manager*
 	set_interrupt_descriptor_entry(0x0D + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0D, 0, IDT_INTERRUPT_GATE);
 	set_interrupt_descriptor_entry(0x0E + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0E, 0, IDT_INTERRUPT_GATE);
 	set_interrupt_descriptor_entry(0x0F + INTERRUPT_OFFSET, code_segment, &handle_interrupt_0x0F, 0, IDT_INTERRUPT_GATE);
+	set_interrupt_descriptor_entry(0x80                   , code_segment, &handle_interrupt_0x80, 0, IDT_INTERRUPT_GATE);
 
 	pic_master_command.write(0x11);	// Master init
 	pic_slave_command.write(0x11);	// Slave init
@@ -110,7 +111,7 @@ uint32_t Interrupt_manager::handle_interrupt(uint8_t interrupt_number, uint32_t 
 
 uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32_t esp) {
 	if (handlers[interrupt_number] != 0) {
-		handlers[interrupt_number]->handle();
+		esp = handlers[interrupt_number]->handle(esp);
 	} else if (interrupt_number == INTERRUPT_OFFSET) {
 		esp = (uint32_t)task_manager->shedule((CPU_state*)esp);
 	} else {
@@ -139,4 +140,4 @@ Interrupt_handler::~Interrupt_handler() {
 		Interrupt_manager::get()->handlers[interrupt_number] = 0;
 	}
 }
-void Interrupt_handler::handle() {}
+uint32_t Interrupt_handler::handle(uint32_t esp) {}

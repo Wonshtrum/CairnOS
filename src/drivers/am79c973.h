@@ -59,7 +59,7 @@ public:
 	virtual void activate() override;
 	virtual uint32_t reset() override;
 
-	virtual void handle() override;
+	virtual uint32_t handle(uint32_t esp) override;
 
 	void send(uint8_t* buffer, uint32_t size);
 	void receive();

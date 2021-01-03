@@ -40,17 +40,17 @@ void Driver_mouse::activate() {
 	}
 }
 
-void Driver_mouse::handle() {
+uint32_t Driver_mouse::handle(uint32_t esp) {
 	uint8_t status = command_port.read();
 	if (!(status & 0x20)) {
-		return;
+		return esp;
 	}
 
 	buffer[offset] = data_port.read();
 	offset = (offset + 1) % 3;
 
 	if (handler == 0) {
-		return;
+		return esp;
 	}
 
 	if (offset == 0) {
@@ -68,6 +68,8 @@ void Driver_mouse::handle() {
 		}
 		buttons = buffer[0];
 	}
+
+	return esp;
 }
 
 void Driver_mouse::set_event_handler(Mouse_event_handler* handler) {

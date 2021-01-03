@@ -7,10 +7,12 @@
 #include "hardware/pci.h"
 #include "drivers/all.h"
 #include "core/handlers/all.h"
-#include "core/multitasking.h"
+#include "core/system/multitasking.h"
+#include "core/system/syscalls.h"
+#include "core/system/hooks/syscalls.h"
 #include "gui/all.h"
 
-#define GRAPHICSMODE 1
+#define GRAPHICSMODE 2
 
 
 typedef void (*constructor)();
@@ -21,6 +23,19 @@ extern "C" void call_constructors() {
 		(*i)();
 	}
 }
+
+
+void taskA() {
+	while (true) {
+		sys_print_str("A");
+	}
+}
+void taskB() {
+	while (true) {
+		sys_print_str("B");
+	}
+}
+
 
 extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("Hello world!\n", true);
@@ -42,6 +57,8 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 
 	Interrupt_manager interrupt_manager(&gdt, &task_manager);
 	print_str("IDT initialized\n");
+	Syscall_handler syscalls(0x80);
+	print_str("Syscalls handler created\n");
 
 	//hook hardware
 	
@@ -58,7 +75,7 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 
 	print_str("\n");
 	Peripheral_component_interconnect_controller PCI_controller;
-	PCI_controller.select_drivers(2);
+	PCI_controller.select_drivers(1);
 	print_str("\n");
 
 /*
@@ -100,19 +117,20 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 		{ 320, 200, 256 }
 	};
 
-	uint8_t mode = 10; //2 10
+	uint8_t mode = GRAPHICSMODE;
 	vga.set_mode(g_modes[mode][0], g_modes[mode][1], g_modes[mode][2]);
-	Graphics_context* ctx = vga.get_graphics_context();
-	Desktop desktop(ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
-	Window w1(5, 5, 100, 50, {0, 0, 0});
-	Window w2(70, 40, 120, 80, {0, 0xA8, 0});
-	Composite_widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
-	desktop.add_child(&w1);
-	desktop.add_child(&w2);
-	w2.add_child(&f1);
-	w1.add_child(&f1);
-
-	mouse.set_event_handler(&desktop);
+	#if GRAPHICSMODE >= 10
+		Graphics_context* ctx = vga.get_graphics_context();
+		Desktop desktop(ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
+		Window w1(5, 5, 100, 50, {0, 0, 0});
+		Window w2(70, 40, 120, 80, {0, 0xA8, 0});
+		Composite_widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
+		desktop.add_child(&w1);
+		desktop.add_child(&w2);
+		w2.add_child(&f1);
+		w1.add_child(&f1);
+		mouse.set_event_handler(&desktop);
+	#endif
 
 	driver_manager.activate_all();
 	print_str("\n");
@@ -120,7 +138,13 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	interrupt_manager.activate();
 	print_str("\nIDT activated\n");
 
+	Task ta = Task(&gdt, taskA);
+	Task tb = Task(&gdt, taskB);
+	task_manager.add_task(&ta);
+	task_manager.add_task(&tb);
 	while (true) {
+	#if GRAPHICSMODE >= 10
 		desktop.draw(ctx);
+	#endif
 	}
 }

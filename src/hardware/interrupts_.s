@@ -57,6 +57,7 @@ handle_interrupt 0x0C
 handle_interrupt 0x0D
 handle_interrupt 0x0E
 handle_interrupt 0x0F
+handle_interrupt 0x80
 
 interrupt_handler_call:
 	/*

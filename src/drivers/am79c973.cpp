@@ -93,7 +93,7 @@ uint32_t Driver_am79c973::reset() {
 	return 10;
 }
 
-void Driver_am79c973::handle() {
+uint32_t Driver_am79c973::handle(uint32_t esp) {
 	print_str("INTERRUPT FROM AMD am79c973 (");
 	print_hex(init.physical_addr);
 	print_str(")\n");
@@ -111,6 +111,8 @@ void Driver_am79c973::handle() {
 	// acknoledge
 	register_addr_port.write(0);
 	register_data_port.write(temp);
+
+	return esp;
 }
 
 void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {

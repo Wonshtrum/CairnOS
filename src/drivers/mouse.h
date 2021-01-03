@@ -38,7 +38,7 @@ public:
 
 	virtual char* get_name() override;
 
-	virtual void handle() override;
+	virtual uint32_t handle(uint32_t esp) override;
 	virtual void activate() override;
 	
 	void set_event_handler(Mouse_event_handler* handler);

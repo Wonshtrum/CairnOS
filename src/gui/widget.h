@@ -28,6 +28,7 @@ public:
 	Widget* get_parent();
 
 	virtual void draw(Graphics_context* ctx);
+
 	bool contains(int32_t x, int32_t y);
 	void screen_offset(int32_t& dx, int32_t& dy);
 

@@ -34,7 +34,7 @@ public:
 	virtual char* get_name() override;
 
 	virtual void activate() override;
-	virtual void handle() override;
+	virtual uint32_t handle(uint32_t esp) override;
 
 	void set_event_handler(Keyboard_event_handler* handler);
 };
