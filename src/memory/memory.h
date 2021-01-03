@@ -41,5 +41,7 @@ void* operator new[](size_t size);
 void operator delete(void* ptr);
 void operator delete[](void* ptr);
 
+void* malloc(size_t size);
+
 
 #endif

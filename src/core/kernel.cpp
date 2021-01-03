@@ -10,6 +10,8 @@
 #include "core/system/multitasking.h"
 #include "core/system/syscalls.h"
 #include "core/system/hooks/syscalls.h"
+#include "net/ethernet.h"
+#include "net/ethernetFrame.h"
 #include "gui/all.h"
 
 #define GRAPHICSMODE 2
@@ -135,13 +137,19 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	driver_manager.activate_all();
 	print_str("\n");
 
+	Driver_am79c973* eth0 = (Driver_am79c973*)driver_manager.debug_get(3);
+	Ethernet_frame_provider ethernet_frame(eth0);
+	char* msg = "FOO";
+	ethernet_frame.send(MAC_BROADCAST, 0x0608, (uint8_t*)msg, 3);
+
 	interrupt_manager.activate();
 	print_str("\nIDT activated\n");
-
+/*
 	Task ta = Task(&gdt, taskA);
 	Task tb = Task(&gdt, taskB);
 	task_manager.add_task(&ta);
 	task_manager.add_task(&tb);
+*/
 	while (true) {
 	#if GRAPHICSMODE >= 10
 		desktop.draw(ctx);

@@ -6,6 +6,7 @@
 
 void print_str(char* str, bool clear = false);
 void print_chr(char chr);
+void print_bfr(uint8_t* buffer, uint32_t size);
 
 void print_hex(int8_t  n);
 void print_hex(int16_t n);

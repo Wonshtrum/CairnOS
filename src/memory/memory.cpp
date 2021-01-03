@@ -103,3 +103,7 @@ void operator delete(void* ptr) {
 void operator delete[](void* ptr) {
 	return Memory_mamanger::get()->free(ptr);
 }
+
+void* malloc(size_t size) {
+	return Memory_mamanger::get()->malloc(size);
+}

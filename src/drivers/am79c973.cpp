@@ -2,7 +2,7 @@
 
 
 Driver_am79c973::Driver_am79c973(Device_descriptor* dev):
-	Driver(),
+	Driver_ethernet(),
 	Interrupt_handler(dev->interrupt + INTERRUPT_OFFSET),
 	mac_addr0_port(dev->port_base + 0x0),
 	mac_addr2_port(dev->port_base + 0x2),
@@ -75,6 +75,8 @@ Driver_am79c973::~Driver_am79c973() {}
 char* Driver_am79c973::get_name() { return "AMD am79c973"; }
 
 void Driver_am79c973::activate() {
+	activated = true;
+
 	register_addr_port.write(0);
 	register_data_port.write(0x41);
 
@@ -94,9 +96,7 @@ uint32_t Driver_am79c973::reset() {
 }
 
 uint32_t Driver_am79c973::handle(uint32_t esp) {
-	print_str("INTERRUPT FROM AMD am79c973 (");
-	print_hex(init.physical_addr);
-	print_str(")\n");
+	print_str("INTERRUPT FROM AMD am79c973\n");
 	register_addr_port.write(0);
 	uint32_t temp = register_data_port.read();
 
@@ -115,6 +115,10 @@ uint32_t Driver_am79c973::handle(uint32_t esp) {
 	return esp;
 }
 
+uint64_t Driver_am79c973::get_mac() {
+	return init.physical_addr;
+}
+
 void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 	uint32_t send_descriptor = current_send_buffer;
 	current_send_buffer = (current_send_buffer + 1) % 8;
@@ -122,6 +126,9 @@ void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 	if (size > 1518) {
 		size = 1518;
 	}
+	print_str("---");
+	print_bfr(buffer, size);
+	print_str("---\n");
 
 	uint8_t* src = buffer + size - 1;
 	uint8_t* dst = (uint8_t*)(send_buffer_desc[send_descriptor].address + size - 1);
@@ -147,9 +154,10 @@ void Driver_am79c973::receive() {
 			}
 			uint8_t* buffer = (uint8_t*)(recv_buffer_desc[current_recv_buffer].address);
 
-			for (uint32_t i = 0 ; i < size ; i++) {
-				print_hex(buffer[i]);
-				print_str(" ");
+			if (handler != 0) {
+				if (handler->on_receive(buffer, size)) {
+					send(buffer, size);
+				}
 			}
 		}
 		recv_buffer_desc[current_recv_buffer].flags_2 = 0;

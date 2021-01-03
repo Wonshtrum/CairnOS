@@ -50,6 +50,12 @@ void print_chr(char chr) {
 	print_str(chr_template);
 }
 
+void print_bfr(uint8_t* buffer, uint32_t size) {
+	for (uint32_t i = 0 ; i < size ; i++) {
+		print_chr(buffer[i]);
+	}
+}
+
 static char* hex_table = "0123456789abcdef";
 static char* hex_template = "0x****************G";
 #define _PRINT_HEX(T, N) void print_hex(T n) {\

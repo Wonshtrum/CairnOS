@@ -6,9 +6,10 @@
 #include "hardware/port.h"
 #include "hardware/interrupts.h"
 #include "hardware/pci.h"
+#include "net/ethernet.h"
 
 
-class Driver_am79c973: public Driver, public Interrupt_handler {
+class Driver_am79c973: public Driver_ethernet, public Interrupt_handler {
 private:
 	struct Buffer_descriptor {
 		uint32_t address;
@@ -61,8 +62,9 @@ public:
 
 	virtual uint32_t handle(uint32_t esp) override;
 
-	void send(uint8_t* buffer, uint32_t size);
-	void receive();
+	virtual uint64_t get_mac() override;
+	virtual void send(uint8_t* buffer, uint32_t size) override;
+	virtual void receive() override;
 };
 
 
