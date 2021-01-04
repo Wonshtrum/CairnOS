@@ -100,13 +100,14 @@ uint32_t Driver_am79c973::handle(uint32_t esp) {
 	register_addr_port.write(0);
 	uint32_t temp = register_data_port.read();
 
-	if ((temp & 0x8000) == 0x8000) print_str("GENERAL ERROR\n");
-	if ((temp & 0x2000) == 0x2000) print_str("COLLISION ERROR\n");
-	if ((temp & 0x1000) == 0x1000) print_str("MISSED FRAME ERROR\n");
-	if ((temp & 0x0800) == 0x0800) print_str("MEMORY ERROR\n");
+	if ((temp & 0x0100) == 0x0100) print_str(" INIT DONE\n");
+	if ((temp & 0x0200) == 0x0200) print_str(" DATA SENT\n");
 	if ((temp & 0x0400) == 0x0400) receive();
-	if ((temp & 0x0200) == 0x0200) print_str("DATA SENT\n");
-	if ((temp & 0x0100) == 0x0100) print_str("INIT DONE\n");
+	if ((temp & 0x0800) == 0x0800) print_str(" MEMORY ERROR\n");
+	if ((temp & 0x1000) == 0x1000) print_str(" MISSED FRAME ERROR\n");
+	if ((temp & 0x2000) == 0x2000) print_str(" COLLISION ERROR\n");
+	if ((temp & 0x8000) == 0x8000) print_str(" GENERAL ERROR\n");
+	print_str("\n");
 
 	// acknoledge
 	register_addr_port.write(0);
@@ -115,6 +116,12 @@ uint32_t Driver_am79c973::handle(uint32_t esp) {
 	return esp;
 }
 
+void Driver_am79c973::set_ip(uint32_t ip) {
+	init.logical_addr = ip;
+}
+uint32_t Driver_am79c973::get_ip() {
+	return init.logical_addr;
+}
 uint64_t Driver_am79c973::get_mac() {
 	return init.physical_addr;
 }
@@ -126,9 +133,6 @@ void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 	if (size > 1518) {
 		size = 1518;
 	}
-	print_str("---");
-	print_bfr(buffer, size);
-	print_str("---\n");
 
 	uint8_t* src = buffer + size - 1;
 	uint8_t* dst = (uint8_t*)(send_buffer_desc[send_descriptor].address + size - 1);
@@ -144,7 +148,7 @@ void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 }
 
 void Driver_am79c973::receive() {
-	print_str("DATA RECEIVED\n");
+	print_str(" DATA RECEIVED\n");
 	for (; (recv_buffer_desc[current_recv_buffer].flags_1 & 0x80000000) == 0 ; current_recv_buffer = (current_recv_buffer + 1) % 8) {
 		// check ERR = 0 / STP = 1 / ENP = 1
 		if ((recv_buffer_desc[current_recv_buffer].flags_1 & 0x43000000) == 0x03000000 ) {
@@ -163,5 +167,4 @@ void Driver_am79c973::receive() {
 		recv_buffer_desc[current_recv_buffer].flags_2 = 0;
 		recv_buffer_desc[current_recv_buffer].flags_1 = 0x8000F7FF;
 	}
-	print_str("\n");
 }

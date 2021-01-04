@@ -62,6 +62,8 @@ public:
 
 	virtual uint32_t handle(uint32_t esp) override;
 
+	virtual uint32_t get_ip() override;
+	virtual void set_ip(uint32_t ip) override;
 	virtual uint64_t get_mac() override;
 	virtual void send(uint8_t* buffer, uint32_t size) override;
 	virtual void receive() override;

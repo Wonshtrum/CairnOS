@@ -10,8 +10,7 @@
 #include "core/system/multitasking.h"
 #include "core/system/syscalls.h"
 #include "core/system/hooks/syscalls.h"
-#include "net/ethernet.h"
-#include "net/ethernetFrame.h"
+#include "net/all.h"
 #include "gui/all.h"
 
 #define GRAPHICSMODE 2
@@ -43,6 +42,10 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("Hello world!\n", true);
 	print_hex(magic_number);
 
+
+	/////////////////
+	// GLOBAL CONF
+	/////////////////
 	Global_descriptor_table gdt;
 	print_str("GDT loaded\n");
 
@@ -62,8 +65,10 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	Syscall_handler syscalls(0x80);
 	print_str("Syscalls handler created\n");
 
-	//hook hardware
-	
+
+	/////////////////
+	// DRIVERS
+	/////////////////
 	Print_keyboard keyboard_handler;
 	Driver_keyboard keyboard(&keyboard_handler);
 	driver_manager.add_driver(&keyboard);
@@ -81,6 +86,9 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("\n");
 
 /*
+	/////////////////
+	// HARDDRIVE
+	/////////////////
 	// interrupt 14
 	Driver_ATA ata0m(0x1F0, true);
 	print_str("\nATA primary master: ");
@@ -105,6 +113,9 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	// fourth: 0x168
 */
 
+	/////////////////
+	// SCREEN
+	/////////////////
 	uint32_t g_modes[][3] = {
 		{ 40, 25, 0 },
 		{ 40, 50, 0 },
@@ -118,7 +129,6 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 		{ 720, 480, 16 },
 		{ 320, 200, 256 }
 	};
-
 	uint8_t mode = GRAPHICSMODE;
 	vga.set_mode(g_modes[mode][0], g_modes[mode][1], g_modes[mode][2]);
 	#if GRAPHICSMODE >= 10
@@ -134,17 +144,38 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 		mouse.set_event_handler(&desktop);
 	#endif
 
+
 	driver_manager.activate_all();
 	print_str("\n");
 
+
+	/////////////////
+	// NETWORKING
+	/////////////////
+	uint32_t my_ip = make_ip_be(10, 0, 2, 15);
+	uint32_t gw_ip = make_ip_be(10, 0, 2, 2);
 	Driver_am79c973* eth0 = (Driver_am79c973*)driver_manager.debug_get(3);
+	eth0->set_ip(my_ip);
 	Ethernet_frame_provider ethernet_frame(eth0);
-	char* msg = "FOO";
-	ethernet_frame.send(MAC_BROADCAST, 0x0608, (uint8_t*)msg, 3);
+	Address_resolution_protocol arp(&ethernet_frame);
+
+
 
 	interrupt_manager.activate();
-	print_str("\nIDT activated\n");
+	print_str("IDT activated\n\n");
+
+
 /*
+	char* msg = "FOO";
+	ethernet_frame.send(MAC_BROADCAST, 0x0608, (uint8_t*)msg, 3);
+*/
+	uint64_t gw_mac = arp.resolve(gw_ip);
+	print_hex(gw_mac);
+
+/*
+	/////////////////
+	// MULTITASKING
+	/////////////////
 	Task ta = Task(&gdt, taskA);
 	Task tb = Task(&gdt, taskB);
 	task_manager.add_task(&ta);

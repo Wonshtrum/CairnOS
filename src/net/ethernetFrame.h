@@ -19,7 +19,7 @@ typedef uint32_t Ethernet_frame_footer;
 
 class Ethernet_frame_provider;
 class Ethernet_frame_handler {
-private:
+protected:
 	uint16_t ether_type;
 	Ethernet_frame_provider* backend;
 
