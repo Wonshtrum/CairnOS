@@ -158,9 +158,14 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	uint32_t mask = make_ip_be(255, 255, 255, 0);
 	Driver_am79c973* eth0 = (Driver_am79c973*)driver_manager.debug_get(3);
 	eth0->set_ip(my_ip);
+	// ethernet
 	Ethernet_frame_provider ethernet(eth0);
+	// ethenet->arp
 	Address_resolution_protocol arp(&ethernet);
+	// ethenet->ipv4
 	Internet_protocol_provider ipv4(&ethernet, &arp, gw_ip, mask);
+	// ethenet->ipv4->icmp
+	Internet_control_message_protocol icmp(&ipv4);
 
 
 
@@ -173,9 +178,8 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	gw_mac = arp.resolve(gw_ip);
 	print_hex(gw_mac);
 */
-	char* msg = "foobar";
-	ipv4.send(gw_ip, 0x0001, (uint8_t*)msg, 6);
-	print_str("\n");
+	arp.broadcast_mac(mask);
+	icmp.echo_reply(gw_ip);
 
 /*
 	/////////////////
@@ -186,8 +190,11 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	task_manager.add_task(&ta);
 	task_manager.add_task(&tb);
 */
+
+/*
 	print_str("\nHEAP STATUS:\n");
 	memory_mamanger.diagnostic();
+*/
 	while (true) {
 	#if GRAPHICSMODE >= 10
 		desktop.draw(ctx);

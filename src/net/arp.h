@@ -3,10 +3,12 @@
 
 #include "utils/types.h"
 #include "utils/io.h"
+#include "net/utils.h"
 #include "net/ethernetFrame.h"
 #include "net/ethernet.h"
 
 #define MAX_CACHE_ENTRIES 100
+
 
 struct ARP_frame {
 	uint16_t hardware_type;
@@ -37,6 +39,7 @@ public:
 	void request_mac(uint32_t ip);
 	uint64_t get_mac(uint32_t ip);
 	uint64_t resolve(uint32_t ip);
+	void broadcast_mac(uint32_t mask);
 };
 
 

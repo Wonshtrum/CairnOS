@@ -96,17 +96,17 @@ uint32_t Driver_am79c973::reset() {
 }
 
 uint32_t Driver_am79c973::handle(uint32_t esp) {
-	print_str("INTERRUPT FROM AMD am79c973\n");
+	print_str("\nINTERRUPT FROM AMD am79c973: ");
 	register_addr_port.write(0);
 	uint32_t temp = register_data_port.read();
 
-	if ((temp & 0x0100) == 0x0100) print_str(" INIT DONE\n");
-	if ((temp & 0x0200) == 0x0200) print_str(" DATA SENT\n");
+	if ((temp & 0x0100) == 0x0100) print_str("INIT ");
+	if ((temp & 0x0200) == 0x0200) print_str("SENT ");
 	if ((temp & 0x0400) == 0x0400) receive();
-	if ((temp & 0x0800) == 0x0800) print_str(" MEMORY ERROR\n");
-	if ((temp & 0x1000) == 0x1000) print_str(" MISSED FRAME ERROR\n");
-	if ((temp & 0x2000) == 0x2000) print_str(" COLLISION ERROR\n");
-	if ((temp & 0x8000) == 0x8000) print_str(" GENERAL ERROR\n");
+	if ((temp & 0x0800) == 0x0800) print_str("MEM_ERR ");
+	if ((temp & 0x1000) == 0x1000) print_str("MIS_ERR ");
+	if ((temp & 0x2000) == 0x2000) print_str("COL_ERR ");
+	if ((temp & 0x8000) == 0x8000) print_str("ERROR ");
 	print_str("\n");
 
 	// acknoledge
@@ -139,6 +139,12 @@ void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 	for (; src >= buffer ; src--, dst--) {
 		*dst = *src;
 	}
+	print_str("Packet sent: ");
+	for (uint32_t i = 0 ; i < size && i < 64 ; i++) {
+		print_hex(buffer[i], false);
+		print_str(" ");
+	}
+	print_str("\n");
 	send_buffer_desc[send_descriptor].avail = 0;
 	send_buffer_desc[send_descriptor].flags_1 = 0x8300F000 | ((uint16_t)((-size) & 0xFFF));
 	send_buffer_desc[send_descriptor].flags_2 = 0;
@@ -148,7 +154,7 @@ void Driver_am79c973::send(uint8_t* buffer, uint32_t size) {
 }
 
 void Driver_am79c973::receive() {
-	print_str(" DATA RECEIVED\n");
+	print_str("RECEIVED ");
 	for (; (recv_buffer_desc[current_recv_buffer].flags_1 & 0x80000000) == 0 ; current_recv_buffer = (current_recv_buffer + 1) % 8) {
 		// check ERR = 0 / STP = 1 / ENP = 1
 		if ((recv_buffer_desc[current_recv_buffer].flags_1 & 0x43000000) == 0x03000000 ) {

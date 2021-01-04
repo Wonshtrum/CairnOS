@@ -65,6 +65,21 @@ void Address_resolution_protocol::request_mac(uint32_t ip) {
 	send(arp.dst_mac, (uint8_t*)&arp, sizeof(ARP_frame));
 }
 
+void Address_resolution_protocol::broadcast_mac(uint32_t mask) {
+	ARP_frame arp;
+	arp.hardware_type = 0x0100;	// ethernet
+	arp.protocol = 0x0008;		// ipv4
+	arp.hardware_addr_size = 6;	// mac
+	arp.protocol_addr_size = 4;	// ipv4
+	arp.command = 0x0200;		// "reponse"
+	arp.src_mac = backend->get_mac();
+	arp.src_ip = backend->get_ip();
+	arp.dst_mac = MAC_BROADCAST;
+	arp.dst_ip = broadcast_ip(backend->get_ip(), mask);
+
+	send(arp.dst_mac, (uint8_t*)&arp, sizeof(ARP_frame));
+}
+
 uint64_t Address_resolution_protocol::get_mac(uint32_t ip) {
 	for (uint32_t i = 0 ; i < num_entries ; i++) {
 		if (ip_cache[i] == ip) {

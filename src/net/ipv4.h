@@ -3,6 +3,7 @@
 
 #include "utils/types.h"
 #include "utils/bits.h"
+#include "utils/io.h"
 #include "memory/memory.h"
 #include "net/ethernet.h"
 #include "net/ethernetFrame.h"
@@ -10,7 +11,7 @@
 
 
 struct IPv4_frame {
-	uint8_t header_length: 4;	// no options -> 
+	uint8_t header_length: 4;	// no options -> fix
 	uint8_t version: 4;		// ipv4 -> 4
 	uint8_t tos;
 	uint16_t total_length;

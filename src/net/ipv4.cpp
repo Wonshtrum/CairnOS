@@ -68,7 +68,7 @@ void Internet_protocol_provider::send(uint32_t dst_ip, uint8_t protocol, uint8_t
 	frame->version = 4;
 	frame->header_length = sizeof(IPv4_frame)/4;
 	frame->tos = 0;
-	frame->total_length = reverse_endian(sizeof(IPv4_frame) + size);
+	frame->total_length = reverse_endian((uint16_t)(sizeof(IPv4_frame) + size));
 	frame->identification = 0x0100;	// random
 	frame->flags = 0x00;		// not fragmented
 	frame->offset = 0x00;		// first fragment
@@ -97,11 +97,13 @@ uint16_t Internet_protocol_provider::check_sum(uint16_t* data, uint32_t size) {
 	for (uint32_t i = 0 ; i < size/2 ; i++) {
 		tmp += reverse_endian(data[i]);
 	}
+	print_str("\n");
 	if (size % 2) {
 		tmp += reverse_endian((uint16_t)(((uint8_t*)data)[size-1]));
 	}
 	while (tmp & 0xFFFF0000) {
 		tmp = (tmp & 0xFFFF) + (tmp >> 16);
 	}
-	return reverse_endian(~tmp);
+	uint16_t result = ~tmp & 0xFFFF;
+	return reverse_endian(result);
 }

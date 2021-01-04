@@ -58,12 +58,12 @@ void print_bfr(uint8_t* buffer, uint32_t size) {
 
 static char* hex_table = "0123456789abcdef";
 static char* hex_template = "0x****************G";
-#define _PRINT_HEX(T, N) void print_hex(T n) {\
+#define _PRINT_HEX(T, N) void print_hex(T n, bool prefix) {\
 	for (int i = 0 ; i < N/4 ; i++) {\
 		hex_template[N/4+1-i] = hex_table[(n >> (i*4)) & 0xF];\
 	}\
 	hex_template[N/4+2] = '\0';\
-	print_str(hex_template);\
+	print_str(hex_template + (prefix ? 0 : 2));\
 }
 #define PRINT_HEX(N) _PRINT_HEX(int ## N ## _t, N) _PRINT_HEX(uint ## N ## _t, N)
 PRINT_HEX( 8);
@@ -72,12 +72,12 @@ PRINT_HEX(32);
 PRINT_HEX(64);
 
 static char* bin_template = "0b****************************************************************G";
-#define _PRINT_BIN(T, N) void print_bin(T n) {\
+#define _PRINT_BIN(T, N) void print_bin(T n, bool prefix) {\
 	for (int i = 0 ; i < N ; i++) {\
 		bin_template[N+1-i] = ((n >> i) & 1) ? '1' : '0';\
 	}\
 	bin_template[N+2] = '\0';\
-	print_str(bin_template);\
+	print_str(bin_template + (prefix ? 0 : 2));\
 }
 #define PRINT_BIN(N) _PRINT_BIN(int ## N ## _t, N) _PRINT_BIN(uint ## N ## _t, N)
 PRINT_BIN( 8);
