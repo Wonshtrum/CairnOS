@@ -79,6 +79,8 @@ uint64_t Address_resolution_protocol::resolve(uint32_t ip) {
 	if (result == MAC_BROADCAST) {
 		print_str("MAC not in cache\n");
 		request_mac(ip);
+	} else {
+		print_str("MAC in cache\n");
 	}
 	while (result == MAC_BROADCAST) {
 		result = get_mac(ip);

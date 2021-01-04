@@ -28,7 +28,7 @@ public:
 	~Ethernet_frame_handler();
 
 	virtual bool on_receive(uint8_t* payload, uint32_t size);
-	virtual void send(uint64_t dst_mac, uint8_t* payload, uint32_t size);
+	void send(uint64_t dst_mac, uint8_t* payload, uint32_t size);
 
 	uint16_t get_ether_type();
 };

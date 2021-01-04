@@ -9,7 +9,7 @@ Ethernet_frame_handler::Ethernet_frame_handler(Ethernet_frame_provider* backend,
 	this->backend = backend;
 }
 Ethernet_frame_handler::~Ethernet_frame_handler() {
-	backend->handlers[ether_type] = 0;
+	//backend->handlers[ether_type] = 0;
 }
 
 bool Ethernet_frame_handler::on_receive(uint8_t* payload, uint32_t size) {
@@ -28,6 +28,10 @@ Ethernet_frame_provider::Ethernet_frame_provider(Driver_ethernet* backend): Net_
 Ethernet_frame_provider::~Ethernet_frame_provider() {}
 
 bool Ethernet_frame_provider::on_receive(uint8_t* buffer, uint32_t size) {
+	if (size < sizeof(Ethernet_frame_header)) {
+		return false;
+	}
+
 	Ethernet_frame_header* frame = (Ethernet_frame_header*)buffer;
 	bool send_back = false;
 	if (frame->dst_mac == MAC_BROADCAST || frame->dst_mac == backend->get_mac()) {
@@ -65,6 +69,7 @@ void Ethernet_frame_provider::send(uint64_t dst_mac, uint16_t ether_type, uint8_
 	}
 
 	backend->send(full_buffer, sizeof(Ethernet_frame_header) + size);
+	free(full_buffer);
 }
 
 bool Ethernet_frame_provider::add_handler(Ethernet_frame_handler* handler) {

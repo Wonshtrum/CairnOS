@@ -65,7 +65,7 @@ static char* hex_template = "0x****************G";
 	hex_template[N/4+2] = '\0';\
 	print_str(hex_template);\
 }
-#define PRINT_HEX(N) _PRINT_HEX(int##N##_t, N) _PRINT_HEX(uint##N##_t, N)
+#define PRINT_HEX(N) _PRINT_HEX(int ## N ## _t, N) _PRINT_HEX(uint ## N ## _t, N)
 PRINT_HEX( 8);
 PRINT_HEX(16);
 PRINT_HEX(32);
@@ -79,7 +79,7 @@ static char* bin_template = "0b*************************************************
 	bin_template[N+2] = '\0';\
 	print_str(bin_template);\
 }
-#define PRINT_BIN(N) _PRINT_BIN(int##N##_t, N) _PRINT_BIN(uint##N##_t, N)
+#define PRINT_BIN(N) _PRINT_BIN(int ## N ## _t, N) _PRINT_BIN(uint ## N ## _t, N)
 PRINT_BIN( 8);
 PRINT_BIN(16);
 PRINT_BIN(32);
