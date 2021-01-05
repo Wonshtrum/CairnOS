@@ -1,23 +1,48 @@
 #include "udp.h"
 
 
-UDP_socket::UDP_socket(User_datagram_protocol_provider* backend): backend(backend) {}
+User_datagram_protocol_handler::User_datagram_protocol_handler(): socket(0) {}
+User_datagram_protocol_handler::~User_datagram_protocol_handler() {
+	if (socket != 0) {
+		socket->unbind(this);
+	}
+}
+void User_datagram_protocol_handler::on_receive(uint8_t* payload, uint32_t size) {}
+void User_datagram_protocol_handler::send(uint8_t* buffer, uint32_t size) {
+	if (socket != 0 && !socket->is_listening()) {
+		socket->send(buffer, size);
+	}
+}
+
+
+UDP_socket::UDP_socket(User_datagram_protocol_provider* backend):
+	listening(false),
+	backend(backend),
+	handler(0) {}
 UDP_socket::~UDP_socket() {}
 
+bool UDP_socket::is_listening() {
+	return listening;
+}
+
 void UDP_socket::on_receive(uint8_t* payload, uint32_t size) {
-	print_str("UDP from ");
-	print_ip4(remote_ip);
-	print_str(":");
-	print_hex(remote_port, false);
-	print_str("\n");
-	for (uint32_t i = 0 ; i < size && i < 64 ; i++) {
-		print_hex(payload[i], false);
+	if (handler != 0) {
+		handler->on_receive(payload, size);
 	}
-	print_str("\n");
 }
 
 void UDP_socket::send(uint8_t* buffer, uint32_t size) {
 	backend->send(this, buffer, size);
+}
+
+void UDP_socket::bind(User_datagram_protocol_handler* handler) {
+	this->handler = handler;
+	handler->socket = this;
+}
+void UDP_socket::unbind(User_datagram_protocol_handler* handler) {
+	if (this->handler == handler) {
+		this->handler = 0;
+	}
 }
 
 void UDP_socket::disconnect() {
@@ -42,14 +67,28 @@ bool User_datagram_protocol_provider::on_receive(uint32_t src_ip, uint32_t dst_i
 	}
 
 	UDP_frame* frame = (UDP_frame*)buffer;
+	UDP_socket* socket = 0;
 	for (uint32_t i = 0 ; i < num_sockets ; i++) {
-		if (sockets[i]->local_port == frame->dst_port
-		&&  sockets[i]->local_ip == dst_ip
-		&&  sockets[i]->remote_port == frame->src_port
-		&&  sockets[i]->remote_ip == src_ip) {
-			sockets[i]->on_receive(buffer + sizeof(UDP_frame), size - sizeof(UDP_frame));
+		if (sockets[i]->listening
+		&& sockets[i]->local_port == frame->dst_port
+		&& sockets[i]->local_ip == dst_ip) {
+			socket = sockets[i];
+			socket->listening = false;
+			socket->remote_port = frame->src_port;
+			socket->remote_ip = src_ip;
+			break;
+		} else if (!sockets[i]->listening
+		&& sockets[i]->local_port == frame->dst_port
+		&& sockets[i]->local_ip == dst_ip
+		&& sockets[i]->remote_port == frame->src_port
+		&& sockets[i]->remote_ip == src_ip) {
+			socket = sockets[i];
 			break;
 		}
+	}
+
+	if (socket != 0) {
+		socket->on_receive(buffer + sizeof(UDP_frame), size - sizeof(UDP_frame));
 	}
 
 	return false;
@@ -67,6 +106,23 @@ UDP_socket* User_datagram_protocol_provider::connect(uint32_t ip, uint16_t port)
 	socket->remote_port = reverse_endian(port);
 	socket->remote_ip = ip;
 	socket->local_port = reverse_endian(free_port++);
+	socket->local_ip = backend->get_ip();
+	sockets[num_sockets++] = socket;
+
+	return socket;
+}
+
+UDP_socket* User_datagram_protocol_provider::listen(uint16_t port) {
+	if (num_sockets >= MAX_NUM_SOCKETS) {
+		return 0;
+	}
+	UDP_socket* socket = (UDP_socket*)malloc(sizeof(UDP_socket));
+	if (socket == 0) {
+		return 0;
+	}
+	*socket = UDP_socket(this);
+	socket->listening = true;
+	socket->local_port = reverse_endian(port);
 	socket->local_ip = backend->get_ip();
 	sockets[num_sockets++] = socket;
 

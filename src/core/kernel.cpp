@@ -182,8 +182,15 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 */
 	arp.broadcast_mac(mask);
 	icmp.echo_reply(gw_ip);
+	#if 0
 	UDP_socket* socket = udp.connect(gw_ip, 1234);
 	socket->send((uint8_t*)"Hello UDP!", 10);
+	#else
+	UDP_socket* socket = udp.listen(1234);
+	Console_UDP udp_handler;
+	socket->bind(&udp_handler);
+	keyboard.set_event_handler(&udp_handler);
+	#endif
 
 /*
 	/////////////////

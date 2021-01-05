@@ -39,14 +39,20 @@ void Driver_keyboard::activate() {
 }
 
 uint32_t Driver_keyboard::handle(uint32_t esp) {
-	uint8_t key = data_port.read();
+	uint8_t code = data_port.read();
 
 	if (handler == 0) {
 		return esp;
 	}
 
-	bool pressed = (key & 0x80) == 0;
-	key &= 0x7F;
+	static bool shift = false;
+	bool pressed = (code & 0x80) == 0;
+	char key = decode_key(code & 0x7F, shift);
+	//if (key == '_') print_hex((uint8_t)(code & 0x7F));
+
+	if (key == SHIFT_KEY) {
+		shift = pressed;
+	}
 	if (pressed) {
 		handler->on_key_down(key);
 	} else {
