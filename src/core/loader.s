@@ -25,5 +25,5 @@ _stop:
 	jmp _stop
 
 .section .bss
-.space 2*1024*1024 # 2MiB for stack
+.space 4*1024*1024 # 4MiB for stack
 kernel_stack:

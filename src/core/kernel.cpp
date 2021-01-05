@@ -160,12 +160,14 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	eth0->set_ip(my_ip);
 	// ethernet
 	Ethernet_frame_provider ethernet(eth0);
-	// ethenet->arp
+	// ethernet->arp
 	Address_resolution_protocol arp(&ethernet);
-	// ethenet->ipv4
+	// ethernet->ipv4
 	Internet_protocol_provider ipv4(&ethernet, &arp, gw_ip, mask);
-	// ethenet->ipv4->icmp
+	// ethernet->ipv4->icmp
 	Internet_control_message_protocol icmp(&ipv4);
+	// ethernet->ipv4->udp
+	User_datagram_protocol_provider udp(&ipv4);
 
 
 
@@ -180,6 +182,8 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 */
 	arp.broadcast_mac(mask);
 	icmp.echo_reply(gw_ip);
+	UDP_socket* socket = udp.connect(gw_ip, 1234);
+	socket->send((uint8_t*)"Hello UDP!", 10);
 
 /*
 	/////////////////
@@ -195,6 +199,7 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("\nHEAP STATUS:\n");
 	memory_mamanger.diagnostic();
 */
+	print_str("OK\n");
 	while (true) {
 	#if GRAPHICSMODE >= 10
 		desktop.draw(ctx);

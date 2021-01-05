@@ -1,7 +1,8 @@
 #include "icmp.h"
 
 
-Internet_control_message_protocol::Internet_control_message_protocol(Internet_protocol_provider* backend): Internet_protocol_handler(backend, 0x0001) {}
+Internet_control_message_protocol::Internet_control_message_protocol(Internet_protocol_provider* backend):
+	Internet_protocol_handler(backend, 0x01) {}
 Internet_control_message_protocol::~Internet_control_message_protocol() {}
 
 bool Internet_control_message_protocol::on_receive(uint32_t src_ip, uint32_t dst_ip, uint8_t* payload, uint32_t size) {

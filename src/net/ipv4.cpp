@@ -88,6 +88,7 @@ void Internet_protocol_provider::send(uint32_t dst_ip, uint8_t protocol, uint8_t
 	if ((dst_ip & mask) != (backend->get_ip() & mask)) {
 		route = gw_ip;
 	}
+
 	backend->send(arp->resolve(route), ether_type, full_buffer, sizeof(IPv4_frame) + size);
 	free(full_buffer);
 }

@@ -118,6 +118,7 @@ uint32_t Interrupt_manager::do_handle_interrupt(uint8_t interrupt_number, uint32
 		print_str("UNHANDLED INTERRUPT ");
 		print_hex(interrupt_number);
 		print_str("\n");
+		while(1) {}
 	}
 
 	if (INTERRUPT_OFFSET <= interrupt_number && interrupt_number < INTERRUPT_OFFSET + 0x10) {

@@ -27,6 +27,8 @@ public:
 	Ethernet_frame_handler(Ethernet_frame_provider* backend, uint16_t ether_type);
 	~Ethernet_frame_handler();
 
+	uint32_t get_mac();
+	uint32_t get_ip();
 	virtual bool on_receive(uint8_t* payload, uint32_t size);
 	void send(uint64_t dst_mac, uint8_t* payload, uint32_t size);
 

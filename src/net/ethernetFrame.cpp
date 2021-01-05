@@ -12,6 +12,14 @@ Ethernet_frame_handler::~Ethernet_frame_handler() {
 	//backend->handlers[ether_type] = 0;
 }
 
+uint32_t Ethernet_frame_handler::get_mac() {
+	return backend->get_mac();
+}
+
+uint32_t Ethernet_frame_handler::get_ip() {
+	return backend->get_ip();
+}
+
 bool Ethernet_frame_handler::on_receive(uint8_t* payload, uint32_t size) {
 	return false;
 }
