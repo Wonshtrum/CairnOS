@@ -15,8 +15,8 @@ Graphics_context* Desktop::get_ctx() {
 void Desktop::set_ctx(Graphics_context* ctx) {
 	this->ctx = ctx;
 }
-void Desktop::invalidate(Bounding_box boxes[]) {
-	for (uint8_t i = 0 ; i < 4 ; i++) {
+void Desktop::invalidate(Bounding_box boxes[], uint8_t n) {
+	for (uint8_t i = 0 ; i < n ; i++) {
 		if (!boxes[i].is_empty()) {
 			draw(ctx, boxes[i]);
 		}

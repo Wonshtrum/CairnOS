@@ -13,6 +13,7 @@ struct Bounding_box {
 	int32_t height;
 
 	bool is_empty();
+	void outline(Bounding_box boxes[], uint8_t border = 1);
 };
 
 

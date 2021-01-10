@@ -19,6 +19,7 @@ public:
 
 	virtual void put_pixel(int32_t x, int32_t y, Color color);
 	void fill_rectangle(int32_t ox, int32_t oy, int32_t width, int32_t height, Color color);
+	void rectangle(int32_t ox, int32_t oy, int32_t width, int32_t height, Color color);
 };
 
 

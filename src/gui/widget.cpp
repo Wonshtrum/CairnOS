@@ -8,7 +8,8 @@ Widget::Widget(int32_t x, int32_t y, int32_t width, int32_t height, Color color,
 	pos_y(y),
 	width(width),
 	height(height),
-	color(color) {}
+	color(color),
+	transparent(false) {}
 Widget::~Widget() {}
 
 bool Widget::contains(int32_t x, int32_t y) {
@@ -28,9 +29,9 @@ Graphics_context* Widget::get_ctx() {
 	return 0;
 }
 
-void Widget::invalidate(Bounding_box boxes[]) {
+void Widget::invalidate(Bounding_box boxes[], uint8_t n) {
 	if (parent != 0) {
-		parent->invalidate(boxes);
+		parent->invalidate(boxes, n);
 	}
 }
 
@@ -65,23 +66,21 @@ void Widget::screen_offset(int32_t& dx, int32_t& dy) {
 }
 
 void Widget::draw(Graphics_context* ctx) {
+	if (transparent) {
+		return;
+	}
 	int32_t dx = 0, dy = 0;
 	screen_offset(dx, dy);
-	for (int32_t x = 0 ; x < width ; x++) {
-		for (int32_t y = 0 ; y < height ; y++) {
-			ctx->put_pixel(x + dx, y + dy, color);
-		}
-	}
+	ctx->fill_rectangle(dx, dy, width, height, color);
 }
 void Widget::draw(Graphics_context* ctx, Bounding_box box) {
+	if (transparent) {
+		return;
+	}
 	int32_t dx = 0, dy = 0;
 	screen_offset(dx, dy);
 	Bounding_box inner = intersect(box, { dx, dy, width, height });
-	for (int32_t x = 0 ; x < inner.width ; x++) {
-		for (int32_t y = 0 ; y < inner.height ; y++) {
-			ctx->put_pixel(inner.pos_x + x, inner.pos_y + y, color);
-		}
-	}
+	ctx->fill_rectangle(inner.pos_x, inner.pos_y, inner.width, inner.height, color);
 }
 
 Composite_widget::Composite_widget(int32_t x, int32_t y, int32_t width, int32_t height, Color color, bool focussable):
@@ -116,6 +115,9 @@ bool Composite_widget::remove_child(Widget* widget) {
 }
 
 void Composite_widget::draw(Graphics_context* ctx) {
+	if (transparent) {
+		return;
+	}
 	Widget::draw(ctx);
 	for (int32_t i = 0 ; i < num_children ; i++) {
 		children[i]->draw(ctx);
@@ -127,6 +129,10 @@ void Composite_widget::draw(Graphics_context* ctx, Bounding_box box) {
 void Composite_widget::draw(Graphics_context* ctx, Bounding_box box, int32_t layer) {
 	if (layer < 0) {
 		Widget::draw(ctx, box);
+		return;
+	}
+	if (children[layer]->transparent) {
+		draw(ctx, box, layer-1);
 		return;
 	}
 	children[layer]->draw(ctx, box);

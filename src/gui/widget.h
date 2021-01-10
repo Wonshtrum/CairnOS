@@ -20,7 +20,9 @@ protected:
 	int32_t pos_y;
 	int32_t width;
 	int32_t height;
+
 	Color color;
+	bool transparent;
 
 public:
 	Widget(int32_t x, int32_t y, int32_t width, int32_t height, Color color, bool focussable = true);
@@ -28,7 +30,7 @@ public:
 
 	Widget* get_parent();
 	virtual Graphics_context* get_ctx();
-	virtual void invalidate(Bounding_box boxes[]);
+	virtual void invalidate(Bounding_box boxes[], uint8_t n = 4);
 
 	virtual void draw(Graphics_context* ctx);
 	virtual void draw(Graphics_context* ctx, Bounding_box box);

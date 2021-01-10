@@ -4,7 +4,9 @@
 bool Bounding_box::is_empty() {
 	return width <= 0 || height <= 0;
 }
-
+void Bounding_box::outline(Bounding_box boxes[], uint8_t border) {
+	substract(*this, { pos_x + border, pos_y + border, width - 2 * border, height - 2 * border }, boxes);
+}
 
 bool overlapp(Bounding_box a, Bounding_box b) {
 	return a.pos_x + a.width > b.pos_x && b.pos_x + b.width > a.pos_x

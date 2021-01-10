@@ -21,7 +21,7 @@ public:
 
 	void set_ctx(Graphics_context* ctx);
 	virtual Graphics_context* get_ctx() override;
-	virtual void invalidate(Bounding_box boxes[]) override;
+	virtual void invalidate(Bounding_box boxes[], uint8_t n = 4) override;
 
 	virtual void focus(Widget* widget) override;
 
