@@ -15,6 +15,12 @@ bool Widget::contains(int32_t x, int32_t y) {
 	return x >= pos_x && y >= pos_y && x <= pos_x + width && y <= pos_y + height;
 }
 
+Bounding_box Widget::get_bounding_box() {
+	int32_t dx = 0, dy = 0;
+	screen_offset(dx, dy);
+	return { dx, dy, width, height };
+}
+
 void Widget::focus(Widget* widget) {
 	if (parent != 0) {
 		parent->focus(widget);
@@ -51,6 +57,16 @@ void Widget::draw(Graphics_context* ctx) {
 	for (int32_t x = 0 ; x < width ; x++) {
 		for (int32_t y = 0 ; y < height ; y++) {
 			ctx->put_pixel(x + dx, y + dy, color);
+		}
+	}
+}
+void Widget::draw(Graphics_context* ctx, Bounding_box box) {
+	int32_t dx = 0, dy = 0;
+	screen_offset(dx, dy);
+	Bounding_box inner = intersect(box, { dx, dy, width, height });
+	for (int32_t x = 0 ; x < inner.width ; x++) {
+		for (int32_t y = 0 ; y < inner.height ; y++) {
+			ctx->put_pixel(inner.pos_x + x, inner.pos_y + y, color);
 		}
 	}
 }
@@ -92,6 +108,21 @@ void Composite_widget::draw(Graphics_context* ctx) {
 		children[i]->draw(ctx);
 	}
 }
+void Composite_widget::draw(Graphics_context* ctx, Bounding_box box) {
+	return draw(ctx, box, num_children-1);
+}
+void Composite_widget::draw(Graphics_context* ctx, Bounding_box box, int32_t layer) {
+	if (layer < 0) {
+		Widget::draw(ctx, box);
+		return;
+	}
+	children[layer]->draw(ctx, box);
+
+	Boxes boxes = substract(box, children[layer]->get_bounding_box());
+	for (uint8_t i = 0 ; i < boxes.n ; i++) {
+		draw(ctx, boxes.boxes[i], layer-1);
+	}
+};
 
 void Composite_widget::focus(Widget* widget) {
 	focused = widget;

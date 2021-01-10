@@ -4,6 +4,7 @@
 #include "utils/types.h"
 #include "utils/io.h"
 #include "gui/graphicsContext.h"
+#include "gui/boundingBox.h"
 #define MAX_NUM_SUB_WIDGETS 100
 
 class Composite_widget;
@@ -28,9 +29,11 @@ public:
 	Widget* get_parent();
 
 	virtual void draw(Graphics_context* ctx);
+	virtual void draw(Graphics_context* ctx, Bounding_box box);
 
 	bool contains(int32_t x, int32_t y);
 	void screen_offset(int32_t& dx, int32_t& dy);
+	Bounding_box get_bounding_box();
 
 	virtual void focus(Widget* widget);
 
@@ -57,6 +60,8 @@ public:
 	~Composite_widget();
 
 	virtual void draw(Graphics_context* ctx) override;
+	virtual void draw(Graphics_context* ctx, Bounding_box box) override;
+	virtual void draw(Graphics_context* ctx, Bounding_box box, int32_t layer);
 
 	bool add_child(Widget* widget);
 	bool remove_child(Widget* widget);

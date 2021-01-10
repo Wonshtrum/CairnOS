@@ -1,4 +1,5 @@
 #include "color.h"
+#include "boundingBox.h"
 #include "widget.h"
 #include "graphicsContext.h"
 #include "desktop.h"

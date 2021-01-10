@@ -33,13 +33,25 @@ void Desktop::on_mouse_move(int32_t dx, int32_t dy) {
 	Composite_widget::on_mouse_move(old_x, old_y, mouse_x, mouse_y);
 }
 
-void Desktop::draw(Graphics_context* ctx) {
-	Composite_widget::draw(ctx);
+void draw_mouse(Graphics_context* ctx, int32_t x, int32_t y) {
 	for (int32_t i = -2 ; i < 3 ; i++) {
 		for (int32_t j = -2 ; j < 3 ; j++) {
 			if (i == 0 || j == 0) {
-				ctx->put_pixel(mouse_x - i, mouse_y - j, {0xFF, 0xFF, 0xFF});
+				ctx->put_pixel(x - i, y - j, {0xFF, 0xFF, 0xFF});
 			}
 		}
 	}
 }
+
+void Desktop::draw(Graphics_context* ctx) {
+	Composite_widget::draw(ctx);
+	draw_mouse(ctx, mouse_x, mouse_y);
+}
+void Desktop::draw(Graphics_context* ctx, Bounding_box box) {
+	color = {0xA8, 0x00, 0x00};
+	//Widget::draw(ctx);
+	color = {0x00, 0x00, 0xA8};
+	Composite_widget::draw(ctx, box);
+	draw_mouse(ctx, mouse_x, mouse_y);
+}
+

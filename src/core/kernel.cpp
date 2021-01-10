@@ -14,7 +14,7 @@
 #include "net/all.h"
 #include "gui/all.h"
 
-#define GRAPHICSMODE 2
+#define GRAPHICSMODE 10
 
 
 typedef void (*constructor)();
@@ -207,9 +207,10 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	memory_mamanger.diagnostic();
 */
 	print_str("OK\n");
+	Bounding_box screen = desktop.get_bounding_box();
 	while (true) {
 	#if GRAPHICSMODE >= 10
-		desktop.draw(ctx);
+		desktop.draw(ctx, screen);
 	#endif
 	}
 }

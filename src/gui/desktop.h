@@ -23,7 +23,8 @@ public:
 	virtual void on_mouse_up(uint8_t button) override;
 	virtual void on_mouse_move(int32_t dx, int32_t dy) override;
 
-	virtual void draw(Graphics_context* ctx);
+	virtual void draw(Graphics_context* ctx) override;
+	virtual void draw(Graphics_context* ctx, Bounding_box box) override;
 };
 
 
