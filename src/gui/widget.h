@@ -27,6 +27,8 @@ public:
 	~Widget();
 
 	Widget* get_parent();
+	virtual Graphics_context* get_ctx();
+	virtual void invalidate(Bounding_box boxes[]);
 
 	virtual void draw(Graphics_context* ctx);
 	virtual void draw(Graphics_context* ctx, Bounding_box box);
@@ -58,7 +60,7 @@ private:
 public:
 	Composite_widget(int32_t x, int32_t y, int32_t width, int32_t height, Color color, bool focussable = true);
 	~Composite_widget();
-
+	
 	virtual void draw(Graphics_context* ctx) override;
 	virtual void draw(Graphics_context* ctx, Bounding_box box) override;
 	virtual void draw(Graphics_context* ctx, Bounding_box box, int32_t layer);

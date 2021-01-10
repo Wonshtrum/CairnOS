@@ -20,13 +20,10 @@ Bounding_box intersect(Bounding_box a, Bounding_box b) {
 }
 
 
-Boxes substract(Bounding_box main, Bounding_box sub) {
-	Boxes result;
-	Bounding_box boxes[4];
+void substract(Bounding_box main, Bounding_box sub, Bounding_box boxes[]) {
 	if (!overlapp(main, sub)) {
-		result.boxes[0] = main;
-		result.n = 1;
-		return result;
+		boxes[0] = main;
+		return;
 	}
 
 	// left box
@@ -52,12 +49,4 @@ Boxes substract(Bounding_box main, Bounding_box sub) {
 	boxes[3].pos_y = sub.pos_y + sub.height;
 	boxes[3].width = boxes[2].width;
 	boxes[3].height = main.pos_y + main.height - sub.pos_y - sub.height;
-
-	result.n = 0;
-	for (uint32_t i = 0 ; i < 4 ; i++) {
-		if (!boxes[i].is_empty()) {
-			result.boxes[result.n++] = boxes[i];
-		}
-	}
-	return result;
 }

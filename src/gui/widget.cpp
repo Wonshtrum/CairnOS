@@ -21,6 +21,19 @@ Bounding_box Widget::get_bounding_box() {
 	return { dx, dy, width, height };
 }
 
+Graphics_context* Widget::get_ctx() {
+	if (parent != 0) {
+		return parent->get_ctx();
+	}
+	return 0;
+}
+
+void Widget::invalidate(Bounding_box boxes[]) {
+	if (parent != 0) {
+		parent->invalidate(boxes);
+	}
+}
+
 void Widget::focus(Widget* widget) {
 	if (parent != 0) {
 		parent->focus(widget);
@@ -118,17 +131,18 @@ void Composite_widget::draw(Graphics_context* ctx, Bounding_box box, int32_t lay
 	}
 	children[layer]->draw(ctx, box);
 
-	Boxes boxes = substract(box, children[layer]->get_bounding_box());
-	for (uint8_t i = 0 ; i < boxes.n ; i++) {
-		draw(ctx, boxes.boxes[i], layer-1);
+	Bounding_box boxes[4] = { 0 };
+	substract(box, children[layer]->get_bounding_box(), boxes);
+	for (uint8_t i = 0 ; i < 4 ; i++) {
+		if (!boxes[i].is_empty()) {
+			draw(ctx, boxes[i], layer-1);
+		}
 	}
 };
 
 void Composite_widget::focus(Widget* widget) {
 	focused = widget;
-	if (parent != 0) {
-		parent->focus(this);
-	}
+	Widget::focus(this);
 }
 
 
@@ -136,11 +150,11 @@ void Composite_widget::on_mouse_down(int32_t x, int32_t y, uint8_t button) {
 	for (int32_t i = num_children - 1 ; i >= 0 ; i--) {
 		if (children[i]->contains(x - pos_x, y - pos_y)) {
 			children[i]->on_mouse_down(x - pos_x, y - pos_x, button);
-			break;
+			return;
 		}
 	}
-	if (parent != 0) {
-		parent->focus(this);
+	if (focussable) {
+		focus(this);
 	}
 }
 void Composite_widget::on_mouse_up(int32_t x, int32_t y, uint8_t button) {

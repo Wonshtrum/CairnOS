@@ -16,15 +16,9 @@ struct Bounding_box {
 };
 
 
-struct Boxes {
-	uint8_t n;
-	Bounding_box boxes[4];
-};
-
-
 bool overlapp(Bounding_box a, Bounding_box b);
 Bounding_box intersect(Bounding_box a, Bounding_box b);
-Boxes substract(Bounding_box main, Bounding_box sub);
+void substract(Bounding_box main, Bounding_box sub, Bounding_box boxes[]);
 
 
 #endif

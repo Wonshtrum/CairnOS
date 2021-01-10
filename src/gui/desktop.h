@@ -13,9 +13,15 @@ private:
 	int32_t mouse_x;
 	int32_t mouse_y;
 
+	Graphics_context* ctx;
+
 public:
 	Desktop(int32_t width, int32_t height, Color color);
 	~Desktop();
+
+	void set_ctx(Graphics_context* ctx);
+	virtual Graphics_context* get_ctx() override;
+	virtual void invalidate(Bounding_box boxes[]) override;
 
 	virtual void focus(Widget* widget) override;
 
@@ -23,8 +29,8 @@ public:
 	virtual void on_mouse_up(uint8_t button) override;
 	virtual void on_mouse_move(int32_t dx, int32_t dy) override;
 
-	virtual void draw(Graphics_context* ctx) override;
-	virtual void draw(Graphics_context* ctx, Bounding_box box) override;
+	void erase_mouse(Graphics_context* ctx, int32_t x, int32_t y);
+	void draw_mouse(Graphics_context* ctx, int32_t x, int32_t y);
 };
 
 

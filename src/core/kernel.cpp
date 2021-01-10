@@ -137,9 +137,9 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 		Desktop desktop(ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
 		Window w1(5, 5, 100, 50, {0, 0, 0});
 		Window w2(70, 40, 120, 80, {0, 0xA8, 0});
-		Composite_widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
-		desktop.add_child(&w1);
+		Widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
 		desktop.add_child(&w2);
+		desktop.add_child(&w1);
 		w2.add_child(&f1);
 		w1.add_child(&f1);
 		mouse.set_event_handler(&desktop);
@@ -208,9 +208,11 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 */
 	print_str("OK\n");
 	Bounding_box screen = desktop.get_bounding_box();
+	desktop.draw(ctx, screen);
+	desktop.set_ctx(ctx);
 	while (true) {
 	#if GRAPHICSMODE >= 10
-		desktop.draw(ctx, screen);
+		//desktop.draw(ctx, screen);
 	#endif
 	}
 }
