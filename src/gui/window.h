@@ -26,7 +26,6 @@ public:
 	virtual void on_mouse_move(int32_t ox, int32_t oy, int32_t nx, int32_t ny) override;
 
 	virtual void draw(Graphics_context* ctx, Bounding_box box) override;
-	void redraw();
 };
 
 

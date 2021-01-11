@@ -2,6 +2,7 @@
 #define __DESKTOP_H__
 
 #include "utils/types.h"
+#include "gui/config.h"
 #include "gui/color.h"
 #include "gui/widget.h"
 #include "gui/graphicsContext.h"

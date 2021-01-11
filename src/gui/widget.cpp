@@ -82,6 +82,12 @@ void Widget::draw(Graphics_context* ctx, Bounding_box box) {
 	Bounding_box inner = intersect(box, { dx, dy, width, height });
 	ctx->fill_rectangle(inner.pos_x, inner.pos_y, inner.width, inner.height, color);
 }
+void Widget::redraw() {
+	Graphics_context* ctx = get_ctx();
+	if (ctx != 0) {
+		draw(ctx, get_bounding_box());
+	}
+}
 
 Composite_widget::Composite_widget(int32_t x, int32_t y, int32_t width, int32_t height, Color color, bool focussable):
 	Widget(x, y, width, height, color),
@@ -133,6 +139,7 @@ void Composite_widget::draw(Graphics_context* ctx, Bounding_box box, int32_t lay
 	}
 	if (children[layer]->transparent) {
 		draw(ctx, box, layer-1);
+		children[layer]->draw(ctx, box);
 		return;
 	}
 	children[layer]->draw(ctx, box);

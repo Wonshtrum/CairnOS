@@ -134,15 +134,37 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	vga.set_mode(g_modes[mode][0], g_modes[mode][1], g_modes[mode][2]);
 	#if GRAPHICSMODE >= 10
 		Graphics_context* ctx = vga.get_graphics_context();
+		Font font2x2 = Fonts::get(2, 2);
+		Font font4x4 = Fonts::get(4, 4);
+		Font font3x5 = Fonts::get(3, 5);
+		Font font5x5 = Fonts::get(5, 5);
 		Desktop desktop(ctx->get_width(), ctx->get_height(), {0x00, 0x00, 0xA8});
 		Window w1(5, 5, 100, 50, {0, 0, 0});
 		Window w2(70, 40, 120, 80, {0, 0xA8, 0});
 		Widget f1(5, 5, 30, 30, {0xFF, 0xFF, 0xFF});
+
+		Text t1(2,  2, 100, 2, {0, 0, 0}, font2x2);
+		Text t2(2,  6, 100, 4, {0, 0, 0}, font4x4);
+		Text t3(2, 12, 100, 5, {0, 0, 0}, font3x5);
+		Text t4(2, 19, 100, 5, {0, 0, 0}, font5x5);
+		t1.add_text("Hello world");
+		t2.add_text("Hello world");
+		t3.add_text("Hello world");
+		t4.add_text("Hello world");
+
 		desktop.add_child(&w2);
 		desktop.add_child(&w1);
 		w2.add_child(&f1);
 		w1.add_child(&f1);
+		w2.add_child(&t1);
+		w2.add_child(&t2);
+		w2.add_child(&t3);
+		w2.add_child(&t4);
 		mouse.set_event_handler(&desktop);
+
+		Bounding_box screen = desktop.get_bounding_box();
+		desktop.draw(ctx, screen);
+		desktop.set_ctx(ctx);
 	#endif
 
 
@@ -206,10 +228,8 @@ extern "C" void kernel_main(void* multiboot_structure, uint32_t magic_number) {
 	print_str("\nHEAP STATUS:\n");
 	memory_mamanger.diagnostic();
 */
+
 	print_str("OK\n");
-	Bounding_box screen = desktop.get_bounding_box();
-	desktop.draw(ctx, screen);
-	desktop.set_ctx(ctx);
 	while (true) {
 	#if GRAPHICSMODE >= 10
 		//desktop.draw(ctx, screen);

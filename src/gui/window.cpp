@@ -18,7 +18,7 @@ void Window::on_mouse_down(int32_t x, int32_t y, uint8_t button) {
 	Composite_widget::on_mouse_down(x, y, button);
 }
 void Window::on_mouse_up(int32_t x, int32_t y, uint8_t button) {
-	if (dragged and button == 1) {
+	if (dragged && button == 1) {
 		stop_drag();
 	}
 	Composite_widget::on_mouse_up(x, y, button);
@@ -60,13 +60,6 @@ void Window::draw(Graphics_context* ctx, Bounding_box box) {
 	#endif
 	Composite_widget::draw(ctx, box);
 };
-
-void Window::redraw() {
-	Graphics_context* ctx = get_ctx();
-	if (ctx != 0) {
-		draw(ctx, get_bounding_box());
-	}
-}
 
 void Window::start_drag() {
 	dragged = true;

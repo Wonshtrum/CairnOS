@@ -4,3 +4,5 @@
 #include "graphicsContext.h"
 #include "desktop.h"
 #include "window.h"
+#include "text.h"
+#include "fonts/font.h"

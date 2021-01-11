@@ -50,6 +50,7 @@ void Desktop::on_mouse_down(uint8_t button) {
 }
 void Desktop::on_mouse_up(uint8_t button) {
 	Composite_widget::on_mouse_up(mouse_x, mouse_y, button);
+	draw_mouse(ctx, mouse_x, mouse_y);
 }
 void Desktop::on_mouse_move(int32_t dx, int32_t dy) {
 	dx /= 2;

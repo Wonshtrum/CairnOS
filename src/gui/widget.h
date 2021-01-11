@@ -2,10 +2,9 @@
 #define __WIDGET_H__
 
 #include "utils/types.h"
-#include "utils/io.h"
+#include "gui/config.h"
 #include "gui/graphicsContext.h"
 #include "gui/boundingBox.h"
-#define MAX_NUM_SUB_WIDGETS 100
 
 class Composite_widget;
 
@@ -34,6 +33,7 @@ public:
 
 	virtual void draw(Graphics_context* ctx);
 	virtual void draw(Graphics_context* ctx, Bounding_box box);
+	void redraw();
 
 	bool contains(int32_t x, int32_t y);
 	void screen_offset(int32_t& dx, int32_t& dy);
