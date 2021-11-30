@@ -9,21 +9,28 @@ It is not designed to be good at anything, but rather to allow me to get a first
  - round-robin multitasking
  - syscall manager
  - dynamic memory allocation
+
 ### Drivers
  - driver manager
  - keyboard
  - mouse
  - networking card (am79c973)
  - VGA
+
 ### Networking
  - ARP
  - ICMP
  - UDP
+
 Basic communication through netcat:
+
 ![netcat test](images/net.png)
+
 ### GUI mode
  - Windows
  - Widgets
  - Fonts
+
 Basic Desktop:
+
 ![gui](images/gui.png)
